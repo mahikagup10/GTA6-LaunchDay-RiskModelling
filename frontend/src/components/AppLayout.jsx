@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useWorkbench } from "../context/WorkbenchContext";
+import ModelStatusBanner from "./ModelStatusBanner";
 
 const navigation = [
   ["/", "Executive Overview"],
@@ -12,7 +13,9 @@ export default function AppLayout() {
   const { status } = useWorkbench();
   const statusLabel = {
     loading: "Running model…",
+    refreshing: "Updating model…",
     ready: "Model connected",
+    cached: "Saved result shown",
     error: "Model unavailable",
     unavailable: "Scenario model planned",
   }[status];
@@ -43,7 +46,7 @@ export default function AppLayout() {
         </nav>
 
         <div className="sidebar-note">
-          <span className="status-dot" />
+          <span className={`status-dot ${status}`} />
           Model status
           <strong>{statusLabel}</strong>
         </div>
@@ -54,6 +57,7 @@ export default function AppLayout() {
           <span>Launch Risk Program</span>
           <span className="evidence-pill">Evidence-aware model</span>
         </header>
+        <ModelStatusBanner />
         <Outlet />
       </main>
     </div>

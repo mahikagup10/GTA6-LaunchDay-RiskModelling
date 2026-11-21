@@ -45,8 +45,14 @@ During development, Vite forwards browser requests beginning with `/api` to Flas
 - Automated model tests
 - Interactive Plotly baseline/residual histogram, sensitivity chart, and scenario heat map
 - Detailed Launch-Day DDoS attack chain with playback, MITRE/STRIDE mappings, control interruption points, evidence labels, and source links
+- Scenario-aware control categorization with recommendations, applicability, exact model effects, cost ranges, implementation time, confidence, and cross-scenario coverage
+- All-scenario portfolio planner that counts shared controls once and reports combined cost, loss reduction, net benefit, ROSI, and scenario-level impact
+- Expandable methodology and evidence register with input provenance, rationale, confidence, source scope, access dates, and framework disclaimers
+- Transparent team readiness index calculated from Prevent, Detect, Respond, and Recover dimensions plus scenario-relevant control impacts
+- Demo-safe loading and connection states with exact-match browser caching for scenario and portfolio calculations
+- Retry controls and clear saved-result timestamps when Flask is temporarily unavailable
 
-The Launch-Day DDoS model is implemented. The other three scenario models are deliberately marked as planned so the interface never presents unsupported estimates as completed analysis.
+All four scenarios have reproducible FAIR-style models. Launch-Day DDoS remains the deeply detailed attack-path scenario and primary demo story.
 
 ## Run the automated checks
 

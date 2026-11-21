@@ -1,6 +1,7 @@
 import unittest
 
-from backend.model.fair import run_simulation
+from backend.data.config import CONTROLS
+from backend.model.fair import run_portfolio, run_simulation
 
 
 class SimulationTests(unittest.TestCase):
@@ -65,6 +66,19 @@ class SimulationTests(unittest.TestCase):
                 control_ids=["cdn-scrubbing"],
                 trials=2_000,
             )
+
+    def test_all_control_portfolio_counts_shared_cost_once(self):
+        result = run_portfolio(trials=2_000, seed=243)
+        expected_cost = sum(control["cost"]["mode"] for control in CONTROLS)
+
+        self.assertEqual(result["controlEconomics"]["estimatedCost"], expected_cost)
+        self.assertEqual(len(result["scenarios"]), 4)
+        self.assertGreater(
+            result["portfolio"]["baselineMean"],
+            result["portfolio"]["residualMean"],
+        )
+        for scenario in result["scenarios"]:
+            self.assertGreater(scenario["baselineMean"], scenario["residualMean"])
 
 
 if __name__ == "__main__":

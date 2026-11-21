@@ -1,12 +1,13 @@
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
+import EvidenceRegister from "../components/EvidenceRegister";
 import LossDistributionChart from "../components/charts/LossDistributionChart";
 import SensitivityChart from "../components/charts/SensitivityChart";
 import { useWorkbench } from "../context/WorkbenchContext";
 import { formatCurrency, formatPercent } from "../utils/formatters";
 
 export default function RiskSimulator() {
-  const { config, selectedScenarioId, setSelectedScenarioId, analysisMode, setAnalysisMode, results, status, error, runSimulation } = useWorkbench();
+  const { config, selectedScenarioId, setSelectedScenarioId, analysisMode, setAnalysisMode, results, status, runSimulation } = useWorkbench();
   const baseline = results?.baseline.metrics;
   const residual = results?.residual.metrics;
   const scenarios = config?.scenarios || [];
@@ -34,8 +35,6 @@ export default function RiskSimulator() {
         <button className={analysisMode === "launch-event" ? "active" : ""} onClick={() => setAnalysisMode("launch-event")}>Launch event</button>
         <button className={analysisMode === "annual" ? "active" : ""} onClick={() => setAnalysisMode("annual")}>Annual</button>
       </div>
-      {error && <div className="status-message warning">{error}</div>}
-
       <section className="simulator-grid">
         <article className="panel inputs-panel">
           <span className="eyebrow">Model assumptions</span>
@@ -47,7 +46,7 @@ export default function RiskSimulator() {
               <strong>{formatter(estimate.low)} / {formatter(estimate.mode)} / {formatter(estimate.high)}</strong>
             </div>
           ))}
-          <button className="primary-button" onClick={runSimulation} disabled={status === "loading"}>{status === "loading" ? "Running 10,000 simulations…" : "Run 10,000 simulations"}</button>
+          <button className="primary-button" onClick={runSimulation} disabled={status === "loading" || status === "refreshing"}>{status === "loading" || status === "refreshing" ? "Running 10,000 simulations…" : "Run 10,000 simulations"}</button>
           <small>Fixed seed: 243. Rerunning the same assumptions produces the same result.</small>
         </article>
         <div>
@@ -68,6 +67,7 @@ export default function RiskSimulator() {
           </article>
         </div>
       </section>
+      <EvidenceRegister scenario={selectedScenario} methodology={config?.methodology} sources={config?.sources} />
     </div>
   );
 }

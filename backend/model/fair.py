@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.stats import spearmanr
 
-from backend.data.config import get_control, get_scenario
+from backend.data.config import CONTROLS, SCENARIOS, get_control, get_scenario
 
 
 DEFAULT_TRIALS = 10_000
@@ -184,5 +184,83 @@ def run_simulation(
             "rosi": net_benefit / control_cost if control_cost else None,
         },
         "sensitivity": _sensitivity(inputs, baseline_losses),
+    }
+
+
+def run_portfolio(
+    control_ids=None,
+    mode="launch-event",
+    trials=DEFAULT_TRIALS,
+    seed=DEFAULT_SEED,
+):
+    control_ids = list(dict.fromkeys(
+        control_ids if control_ids is not None else [control["id"] for control in CONTROLS]
+    ))
+    selected_controls = []
+
+    for control_id in control_ids:
+        control = get_control(control_id)
+        if control is None:
+            raise ValueError(f"Unknown control: {control_id}")
+        selected_controls.append(control)
+
+    scenario_summaries = []
+    total_baseline = 0.0
+    total_residual = 0.0
+
+    for scenario in SCENARIOS:
+        applicable_ids = [
+            control["id"]
+            for control in selected_controls
+            if scenario["id"] in control["coverage"]
+        ]
+        result = run_simulation(
+            scenario_id=scenario["id"],
+            control_ids=applicable_ids,
+            mode=mode,
+            trials=trials,
+            seed=seed,
+        )
+        baseline_mean = result["baseline"]["metrics"]["mean"]
+        residual_mean = result["residual"]["metrics"]["mean"]
+        total_baseline += baseline_mean
+        total_residual += residual_mean
+        scenario_summaries.append(
+            {
+                "scenarioId": scenario["id"],
+                "scenarioName": scenario["name"],
+                "baselineMean": baseline_mean,
+                "residualMean": residual_mean,
+                "lossesAvoided": baseline_mean - residual_mean,
+                "selectedControlIds": applicable_ids,
+            }
+        )
+
+    estimated_cost = sum(control["cost"]["mode"] for control in selected_controls)
+    losses_avoided = total_baseline - total_residual
+    net_benefit = losses_avoided - estimated_cost
+
+    return {
+        "meta": {
+            "analysisMode": mode,
+            "trialsPerScenario": int(trials),
+            "seed": int(seed),
+            "currency": "USD",
+            "scenarioCount": len(scenario_summaries),
+        },
+        "portfolio": {
+            "baselineMean": total_baseline,
+            "residualMean": total_residual,
+            "expectedLossReduction": losses_avoided,
+            "reductionPercent": losses_avoided / total_baseline if total_baseline else 0.0,
+        },
+        "controlEconomics": {
+            "selectedControlIds": control_ids,
+            "estimatedCost": estimated_cost,
+            "lossesAvoided": losses_avoided,
+            "netBenefit": net_benefit,
+            "rosi": net_benefit / estimated_cost if estimated_cost else None,
+        },
+        "scenarios": scenario_summaries,
     }
 

@@ -1,7 +1,17 @@
 ACCESS_DATE = "2026-11-21"
 
 
+ASSUMPTION_METHOD_SOURCE = {
+    "id": "open-fair-methodology",
+    "title": "The Open Group: Open FAIR 2 Foundation risk-analysis concepts",
+    "url": "https://help.opengroup.org/hc/en-us/articles/32130434422290-Competency-to-Role-Mapping-Open-FAIR-2-Foundation",
+    "accessDate": ACCESS_DATE,
+    "type": "methodology-reference",
+}
+
+
 SOURCES = [
+    ASSUMPTION_METHOD_SOURCE,
     {
         "id": "mitre-t1595",
         "title": "MITRE ATT&CK: Active Scanning (T1595)",
@@ -40,6 +50,17 @@ SOURCES = [
 ]
 
 
+METHODOLOGY = {
+    "name": "Team FAIR-style Monte Carlo model",
+    "description": "A decision-support model structured around event frequency, conditional success, and loss magnitude.",
+    "formula": "Successful loss events × (primary loss + secondary loss)",
+    "sampling": "Triangular low, most-likely, and high estimates; 10,000 trials with fixed seed 243.",
+    "controlRule": "Controls multiply frequency, vulnerability, primary loss, or secondary loss; shared controls are costed once in portfolio mode.",
+    "disclaimer": "This is a team-designed FAIR-style model, not an official Open FAIR, NIST, or MITRE assessment.",
+    "sourceIds": ["open-fair-methodology", "nist-csf-2"],
+}
+
+
 SCENARIOS = [
     {
         "id": "launch-ddos",
@@ -48,6 +69,7 @@ SCENARIOS = [
         "summary": "A coordinated traffic flood disrupts the public launch and revenue-critical services.",
         "modelStatus": "implemented",
         "readinessBase": 44,
+        "readinessProfile": {"prevent": 42, "detect": 55, "respond": 43, "recover": 36},
         "recommendedControlIds": ["cdn-scrubbing", "rate-limiting"],
         "assumptions": {
             "threatEventFrequency": {
@@ -95,6 +117,7 @@ SCENARIOS = [
         "summary": "Compromised development access exposes proprietary code and build assets.",
         "modelStatus": "implemented",
         "readinessBase": 46,
+        "readinessProfile": {"prevent": 48, "detect": 45, "respond": 46, "recover": 45},
         "recommendedControlIds": ["repository-hardening", "least-privilege"],
         "assumptions": {
             "threatEventFrequency": {
@@ -142,6 +165,7 @@ SCENARIOS = [
         "summary": "A trusted person releases confidential product or customer information.",
         "modelStatus": "implemented",
         "readinessBase": 42,
+        "readinessProfile": {"prevent": 40, "detect": 44, "respond": 43, "recover": 41},
         "recommendedControlIds": ["least-privilege", "dlp-monitoring"],
         "assumptions": {
             "threatEventFrequency": {
@@ -189,6 +213,7 @@ SCENARIOS = [
         "summary": "Impersonation campaigns distribute malicious downloads and steal credentials.",
         "modelStatus": "implemented",
         "readinessBase": 40,
+        "readinessProfile": {"prevent": 38, "detect": 42, "respond": 41, "recover": 39},
         "recommendedControlIds": ["brand-monitoring", "phishing-resistant-mfa"],
         "assumptions": {
             "threatEventFrequency": {
@@ -232,10 +257,20 @@ SCENARIOS = [
 ]
 
 
+for _scenario in SCENARIOS:
+    for _assumption in _scenario.get("assumptions", {}).values():
+        _assumption["source"] = {
+            **ASSUMPTION_METHOD_SOURCE,
+            "scope": "Methodology reference only; the numeric range is a team-developed estimate requiring validation.",
+        }
+
+
 CONTROLS = [
     {
         "id": "cdn-scrubbing",
         "name": "CDN and DDoS scrubbing",
+        "category": "Protect",
+        "readinessImpact": {"prevent": 22, "detect": 8, "respond": 18, "recover": 8},
         "cost": {"low": 650_000, "mode": 850_000, "high": 1_100_000},
         "implementationWeeks": {"low": 2, "mode": 4, "high": 7},
         "confidence": "high",
@@ -250,6 +285,8 @@ CONTROLS = [
     {
         "id": "rate-limiting",
         "name": "Adaptive rate limiting",
+        "category": "Protect",
+        "readinessImpact": {"prevent": 18, "detect": 12, "respond": 8, "recover": 4},
         "cost": {"low": 180_000, "mode": 260_000, "high": 390_000},
         "implementationWeeks": {"low": 2, "mode": 3, "high": 5},
         "confidence": "medium",
@@ -264,6 +301,8 @@ CONTROLS = [
     {
         "id": "incident-drills",
         "name": "Launch incident drills",
+        "category": "Respond & recover",
+        "readinessImpact": {"prevent": 0, "detect": 10, "respond": 22, "recover": 22},
         "cost": {"low": 80_000, "mode": 120_000, "high": 190_000},
         "implementationWeeks": {"low": 1, "mode": 2, "high": 4},
         "confidence": "medium",
@@ -278,6 +317,8 @@ CONTROLS = [
     {
         "id": "repository-hardening",
         "name": "Repository and CI/CD hardening",
+        "category": "Protect",
+        "readinessImpact": {"prevent": 24, "detect": 14, "respond": 10, "recover": 6},
         "cost": {"low": 380_000, "mode": 550_000, "high": 780_000},
         "implementationWeeks": {"low": 4, "mode": 7, "high": 12},
         "confidence": "medium",
@@ -292,6 +333,8 @@ CONTROLS = [
     {
         "id": "least-privilege",
         "name": "Least-privilege access reviews",
+        "category": "Prevent",
+        "readinessImpact": {"prevent": 24, "detect": 8, "respond": 6, "recover": 4},
         "cost": {"low": 210_000, "mode": 320_000, "high": 470_000},
         "implementationWeeks": {"low": 3, "mode": 6, "high": 10},
         "confidence": "medium",
@@ -306,6 +349,8 @@ CONTROLS = [
     {
         "id": "dlp-monitoring",
         "name": "DLP and behavior monitoring",
+        "category": "Detect & respond",
+        "readinessImpact": {"prevent": 8, "detect": 24, "respond": 18, "recover": 4},
         "cost": {"low": 290_000, "mode": 410_000, "high": 620_000},
         "implementationWeeks": {"low": 5, "mode": 8, "high": 14},
         "confidence": "medium",
@@ -320,6 +365,8 @@ CONTROLS = [
     {
         "id": "contractor-offboarding",
         "name": "Contractor offboarding automation",
+        "category": "Prevent",
+        "readinessImpact": {"prevent": 20, "detect": 10, "respond": 8, "recover": 4},
         "cost": {"low": 85_000, "mode": 140_000, "high": 230_000},
         "implementationWeeks": {"low": 2, "mode": 4, "high": 7},
         "confidence": "medium",
@@ -334,6 +381,8 @@ CONTROLS = [
     {
         "id": "brand-monitoring",
         "name": "Brand monitoring and takedown",
+        "category": "Detect & respond",
+        "readinessImpact": {"prevent": 8, "detect": 24, "respond": 18, "recover": 6},
         "cost": {"low": 190_000, "mode": 280_000, "high": 420_000},
         "implementationWeeks": {"low": 2, "mode": 4, "high": 6},
         "confidence": "medium",
@@ -348,6 +397,8 @@ CONTROLS = [
     {
         "id": "phishing-resistant-mfa",
         "name": "Phishing-resistant MFA",
+        "category": "Prevent",
+        "readinessImpact": {"prevent": 26, "detect": 8, "respond": 6, "recover": 4},
         "cost": {"low": 320_000, "mode": 480_000, "high": 720_000},
         "implementationWeeks": {"low": 4, "mode": 8, "high": 14},
         "confidence": "high",

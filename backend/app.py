@@ -3,8 +3,8 @@ from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-from backend.data.config import ATTACK_CHAIN, CONTROLS, SCENARIOS, SOURCES
-from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_simulation
+from backend.data.config import ATTACK_CHAIN, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
+from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_portfolio, run_simulation
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -27,6 +27,7 @@ def config():
             "controls": CONTROLS,
             "attackChain": ATTACK_CHAIN,
             "sources": SOURCES,
+            "methodology": METHODOLOGY,
             "model": {
                 "trials": DEFAULT_TRIALS,
                 "seed": DEFAULT_SEED,
@@ -43,6 +44,21 @@ def simulate():
         result = run_simulation(
             scenario_id=payload.get("scenarioId", "launch-ddos"),
             control_ids=payload.get("controlIds", []),
+            mode=payload.get("analysisMode", "launch-event"),
+            trials=payload.get("trials", DEFAULT_TRIALS),
+            seed=payload.get("seed", DEFAULT_SEED),
+        )
+    except (TypeError, ValueError) as error:
+        return jsonify({"error": str(error)}), 400
+    return jsonify(result)
+
+
+@app.post("/api/portfolio")
+def portfolio():
+    payload = request.get_json(silent=True) or {}
+    try:
+        result = run_portfolio(
+            control_ids=payload.get("controlIds"),
             mode=payload.get("analysisMode", "launch-event"),
             trials=payload.get("trials", DEFAULT_TRIALS),
             seed=payload.get("seed", DEFAULT_SEED),
