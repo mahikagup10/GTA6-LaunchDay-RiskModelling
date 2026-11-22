@@ -22,6 +22,7 @@ export function WorkbenchProvider({ children }) {
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+  const [demoResetVersion, setDemoResetVersion] = useState(0);
   const activeRequestId = useRef(0);
   const resultsRef = useRef(null);
   const resultsKeyRef = useRef("");
@@ -119,6 +120,15 @@ export function WorkbenchProvider({ children }) {
     setAnalysisMode("launch-event");
   }, [config, selectedScenarioId]);
 
+  const resetDemo = useCallback(() => {
+    const launchScenario = config?.scenarios.find((item) => item.id === "launch-ddos");
+    setSelectedScenarioIdState("launch-ddos");
+    setSelectedControlIds(launchScenario?.recommendedControlIds || ["cdn-scrubbing", "rate-limiting"]);
+    setAnalysisMode("launch-event");
+    setError("");
+    setDemoResetVersion((current) => current + 1);
+  }, [config]);
+
   const retryConnection = useCallback(() => {
     loadConfig();
     runSimulation();
@@ -159,6 +169,8 @@ export function WorkbenchProvider({ children }) {
       selectedControlIds,
       toggleControl,
       resetScenario,
+      resetDemo,
+      demoResetVersion,
       config,
       results,
       status,
@@ -169,7 +181,7 @@ export function WorkbenchProvider({ children }) {
       readinessScore,
       readinessBreakdown,
     }),
-    [selectedScenarioId, setSelectedScenarioId, analysisMode, selectedControlIds, toggleControl, resetScenario, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
+    [selectedScenarioId, setSelectedScenarioId, analysisMode, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
   );
 
   return (

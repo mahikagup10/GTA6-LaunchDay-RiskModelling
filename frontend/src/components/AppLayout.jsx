@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useWorkbench } from "../context/WorkbenchContext";
 import ModelStatusBanner from "./ModelStatusBanner";
 
@@ -10,7 +10,8 @@ const navigation = [
 ];
 
 export default function AppLayout() {
-  const { status } = useWorkbench();
+  const { status, resetDemo } = useWorkbench();
+  const navigate = useNavigate();
   const statusLabel = {
     loading: "Running model…",
     refreshing: "Updating model…",
@@ -55,7 +56,10 @@ export default function AppLayout() {
       <main className="main-content">
         <header className="topbar">
           <span>Launch Risk Program</span>
-          <span className="evidence-pill">Evidence-aware model</span>
+          <div className="topbar-actions">
+            <span className="evidence-pill">Evidence-aware model</span>
+            <button className="demo-reset" onClick={() => { resetDemo(); navigate("/"); }}>Reset demo</button>
+          </div>
         </header>
         <ModelStatusBanner />
         <Outlet />

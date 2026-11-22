@@ -51,6 +51,8 @@ During development, Vite forwards browser requests beginning with `/api` to Flas
 - Transparent team readiness index calculated from Prevent, Detect, Respond, and Recover dimensions plus scenario-relevant control impacts
 - Demo-safe loading and connection states with exact-match browser caching for scenario and portfolio calculations
 - Retry controls and clear saved-result timestamps when Flask is temporarily unavailable
+- Lazy-loaded Plotly bundle so non-chart pages start without downloading the chart engine
+- Global demo reset that returns to Launch-Day DDoS, launch-event mode, recommended controls, the first attack stage, and selected-scenario planning
 
 All four scenarios have reproducible FAIR-style models. Launch-Day DDoS remains the deeply detailed attack-path scenario and primary demo story.
 

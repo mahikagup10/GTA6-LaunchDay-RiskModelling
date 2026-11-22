@@ -6,7 +6,7 @@ import { useWorkbench } from "../context/WorkbenchContext";
 export default function AttackPaths() {
   const [activeStage, setActiveStage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { config } = useWorkbench();
+  const { config, demoResetVersion } = useWorkbench();
   const scenarios = config?.scenarios || fallbackScenarios;
   const attackStages = config?.attackChain || fallbackStages;
   const stage = attackStages[activeStage];
@@ -34,6 +34,11 @@ export default function AttackPaths() {
 
     return () => window.clearTimeout(timer);
   }, [activeStage, attackStages.length, isPlaying]);
+
+  useEffect(() => {
+    setActiveStage(0);
+    setIsPlaying(false);
+  }, [demoResetVersion]);
 
   function selectStage(index) {
     setIsPlaying(false);

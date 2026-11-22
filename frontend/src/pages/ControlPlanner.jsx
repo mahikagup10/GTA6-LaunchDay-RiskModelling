@@ -7,7 +7,7 @@ import { cachePortfolio, readCachedPortfolio } from "../utils/cache";
 import { formatCurrency } from "../utils/formatters";
 
 export default function ControlPlanner() {
-  const { config, results, status, analysisMode, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario } = useWorkbench();
+  const { config, results, status, analysisMode, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
   const [plannerMode, setPlannerMode] = useState("scenario");
   const [portfolioControlIds, setPortfolioControlIds] = useState(null);
   const [portfolioResults, setPortfolioResults] = useState(null);
@@ -30,6 +30,14 @@ export default function ControlPlanner() {
       setPortfolioControlIds(config.controls.map((control) => control.id));
     }
   }, [config, portfolioControlIds]);
+
+  useEffect(() => {
+    setPlannerMode("scenario");
+    setPortfolioResults(null);
+    setPortfolioStatus("idle");
+    setPortfolioError("");
+    if (config) setPortfolioControlIds(config.controls.map((control) => control.id));
+  }, [config, demoResetVersion]);
 
   useEffect(() => {
     if (plannerMode !== "portfolio" || portfolioControlIds === null) return undefined;
