@@ -1,34 +1,39 @@
-import { formatCurrency, formatPercent } from "../utils/formatters";
+import { formatInputValue, readableEvidence } from "../utils/formatters";
 
-const assumptionLabels = {
-  threatEventFrequency: "Threat event frequency",
-  vulnerability: "Conditional success probability",
-  primaryLoss: "Primary loss",
-  secondaryLoss: "Secondary loss",
+const groupLabels = {
+  frequency: "Frequency",
+  vulnerability: "Conditional success",
+  duration: "Duration",
+  "primary-driver": "Primary loss driver",
+  primary: "Primary loss",
+  "secondary-probability": "Secondary probability",
+  secondary: "Secondary loss",
 };
 
-function formatEstimate(key, value) {
-  if (key === "vulnerability") return formatPercent(value);
-  if (key === "primaryLoss" || key === "secondaryLoss") return formatCurrency(value);
-  return value.toFixed(2);
-}
-
-function readableType(value = "model-assumption") {
-  return value.replaceAll("-", " ");
-}
-
 export default function EvidenceRegister({ scenario, methodology, sources = [] }) {
-  if (!scenario?.assumptions || !methodology) return null;
+  if (!scenario?.inputs || !methodology) return null;
+  const sourcesById = Object.fromEntries(sources.map((source) => [source.id, source]));
+  const usedSourceIds = new Set(scenario.inputs.flatMap((item) => item.sourceIds));
+  const scenarioSources = sources.filter((source) => usedSourceIds.has(source.id));
+  const classCounts = scenario.inputs.reduce((counts, item) => {
+    counts[item.evidenceType] = (counts[item.evidenceType] || 0) + 1;
+    return counts;
+  }, {});
 
   return (
     <details className="panel evidence-register" open>
       <summary>
         <div>
           <span className="eyebrow">Transparency layer</span>
-          <h2>Methodology & evidence register</h2>
+          <h2>Methodology and evidence register</h2>
         </div>
-        <span>{Object.keys(scenario.assumptions).length} model inputs</span>
+        <span>{scenario.inputs.length} model inputs · {scenarioSources.length} sources</span>
       </summary>
+
+      <div className="loss-event-statement">
+        <span className="detail-label">Loss event statement · {scenario.timeBasisLabel}</span>
+        <p>{scenario.lossEventStatement}</p>
+      </div>
 
       <div className="methodology-overview">
         <div>
@@ -42,63 +47,67 @@ export default function EvidenceRegister({ scenario, methodology, sources = [] }
           <p>{methodology.sampling}</p>
         </div>
         <div>
-          <span className="detail-label">Control treatment</span>
-          <strong>Explicit parameter multipliers</strong>
-          <p>{methodology.controlRule}</p>
+          <span className="detail-label">Control and cost treatment</span>
+          <strong>Targeted multipliers, reconciled cost basis</strong>
+          <p>{methodology.controlRule} {methodology.costRule}</p>
         </div>
       </div>
 
       <div className="evidence-legend" aria-label="Evidence type legend">
-        <span><i className="legend-dot fact" />Public fact</span>
-        <span><i className="legend-dot estimate" />Team estimate</span>
-        <span><i className="legend-dot assumption" />Model assumption</span>
+        <span><i className="legend-dot fact" />Public fact {classCounts["public-fact"] ? `(${classCounts["public-fact"]})` : ""}</span>
+        <span><i className="legend-dot derived" />Derived value {classCounts["derived-value"] ? `(${classCounts["derived-value"]})` : ""}</span>
+        <span><i className="legend-dot estimate" />Team estimate {classCounts["team-estimate"] ? `(${classCounts["team-estimate"]})` : ""}</span>
+        <span><i className="legend-dot assumption" />Model assumption {classCounts["model-assumption"] ? `(${classCounts["model-assumption"]})` : ""}</span>
       </div>
 
       <section className="assumption-register">
         <div className="register-heading">
-          <div><h3>{scenario.name} inputs</h3><p>Every numeric input exposes its range, rationale, confidence, and provenance.</p></div>
+          <div><h3>{scenario.name} inputs</h3><p>Every input shows its range, distribution, evidence class, sources, rationale, confidence, and control relationship.</p></div>
           <span>Low / most likely / high</span>
         </div>
-        {Object.entries(scenario.assumptions).map(([key, assumption]) => (
-          <article className="assumption-item" key={key}>
+        {scenario.inputs.map((item) => (
+          <article className="assumption-item" key={item.key}>
             <div>
-              <span className={`evidence-badge ${assumption.evidenceType}`}>{readableType(assumption.evidenceType)}</span>
-              <h3>{assumptionLabels[key] || key}</h3>
-              <p>{assumption.rationale}</p>
+              <span className={`evidence-badge ${item.evidenceType}`}>{readableEvidence(item.evidenceType)}</span>
+              <h3>{item.label}</h3>
+              <p>{item.rationale}</p>
             </div>
             <div className="estimate-values">
-              <strong>{formatEstimate(key, assumption.low)}</strong>
-              <strong>{formatEstimate(key, assumption.mode)}</strong>
-              <strong>{formatEstimate(key, assumption.high)}</strong>
+              <strong>{formatInputValue(item, item.low)}</strong>
+              <strong>{formatInputValue(item, item.mode)}</strong>
+              <strong>{formatInputValue(item, item.high)}</strong>
             </div>
             <div className="assumption-meta">
-              <span>Confidence<strong>{assumption.confidence}</strong></span>
-              <span>Unit<strong>{assumption.unit}</strong></span>
+              <span>Group<strong>{groupLabels[item.group] || item.group}</strong></span>
+              <span>Confidence<strong>{item.confidence}</strong></span>
+              <span>Unit<strong>{item.unit}</strong></span>
             </div>
             <div className="provenance-note">
-              <a href={assumption.source.url} target="_blank" rel="noreferrer">{assumption.source.title}</a>
-              <small>Accessed {assumption.source.accessDate}</small>
-              <p>{assumption.source.scope}</p>
+              {item.sourceIds.map((sourceId) => sourcesById[sourceId] && (
+                <a key={sourceId} href={sourcesById[sourceId].url} target="_blank" rel="noreferrer">{sourcesById[sourceId].title}</a>
+              ))}
+              <small>Triangular · Owner {item.owner} · Reviewer {item.reviewer}</small>
+              <p>{item.controlRelationship}</p>
             </div>
           </article>
         ))}
       </section>
 
       <section className="source-register">
-        <div className="register-heading"><div><h3>Source register</h3><p>Public references used for methodology, control framing, and attack-technique mappings.</p></div></div>
+        <div className="register-heading"><div><h3>Source register</h3><p>Sources behind this scenario's inputs. Every source shows publisher, date, reliability, and the claim used.</p></div></div>
         <div className="source-grid">
-          {sources.map((source) => (
-            <a href={source.url} target="_blank" rel="noreferrer" key={source.id}>
-              <span>{readableType(source.type)}</span>
+          {scenarioSources.map((source) => (
+            <a href={source.url} target="_blank" rel="noreferrer" key={source.id} title={source.claim}>
+              <span>{readableEvidence(source.evidenceClass)} · {source.reliability} reliability</span>
               <strong>{source.title}</strong>
-              <small>Accessed {source.accessDate}</small>
+              <small>{source.publisher} · {source.published} · accessed {source.accessDate}</small>
             </a>
           ))}
         </div>
       </section>
 
+      {methodology.timing && <p className="methodology-disclaimer timing">{methodology.timing}</p>}
       <p className="methodology-disclaimer">{methodology.disclaimer}</p>
     </details>
   );
 }
-

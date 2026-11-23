@@ -21,12 +21,12 @@ function histogramTrace(histogram, name, color) {
   };
 }
 
-export default function LossDistributionChart({ baseline, residual }) {
+export default function LossDistributionChart({ baseline, residual, basisLabel = "USD" }) {
   const data = useMemo(() => {
     if (!baseline || !residual) return [];
     return [
       histogramTrace(baseline, "Baseline", "rgba(255, 138, 91, 0.72)"),
-      histogramTrace(residual, "Residual", "rgba(53, 216, 193, 0.72)"),
+      histogramTrace(residual, "Selected controls", "rgba(53, 216, 193, 0.72)"),
     ];
   }, [baseline, residual]);
 
@@ -35,7 +35,7 @@ export default function LossDistributionChart({ baseline, residual }) {
   }
 
   return (
-    <div className="plot-container" role="img" aria-label="Interactive baseline and residual loss distribution histogram">
+    <div className="plot-container" role="img" aria-label="Baseline and residual loss distribution histogram for trials with a loss">
       <Plot
         data={data}
         layout={{
@@ -51,7 +51,7 @@ export default function LossDistributionChart({ baseline, residual }) {
           },
           xaxis: {
             ...axisStyle,
-            title: { text: "Loss magnitude (USD)", standoff: 12 },
+            title: { text: `Loss when a loss occurs (${basisLabel})`, standoff: 12 },
             tickprefix: "$",
             tickformat: "~s",
           },
@@ -68,4 +68,3 @@ export default function LossDistributionChart({ baseline, residual }) {
     </div>
   );
 }
-

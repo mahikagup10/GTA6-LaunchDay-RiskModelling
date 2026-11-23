@@ -1,6 +1,6 @@
 async function request(path, options = {}) {
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 15_000);
+  const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
   let response;
 
   try {
@@ -36,6 +36,14 @@ export function getConfig() {
   return request("/api/config");
 }
 
+export function getOverview() {
+  return request("/api/overview");
+}
+
+export function getPriorities() {
+  return request("/api/controls/priority");
+}
+
 export function simulateRisk(payload) {
   return request("/api/simulate", {
     method: "POST",
@@ -49,4 +57,3 @@ export function simulatePortfolio(payload) {
     body: JSON.stringify(payload),
   });
 }
-

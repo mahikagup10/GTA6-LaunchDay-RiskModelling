@@ -55,7 +55,7 @@ export default function AppLayout() {
 
       <main className="main-content">
         <header className="topbar">
-          <span>Launch Risk Program</span>
+          <span>GTA VI Launch Risk Program · Take-Two Interactive (public-information case)</span>
           <div className="topbar-actions">
             <span className="evidence-pill">Evidence-aware model</span>
             <button className="demo-reset" onClick={() => { resetDemo(); navigate("/"); }}>Reset demo</button>

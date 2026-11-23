@@ -1,0 +1,5143 @@
+{
+  "modelVersion": "2026-11-22-evidence-v1",
+  "seed": 20261124,
+  "trials": 10000,
+  "methodology": {
+    "name": "Team FAIR-style Monte Carlo model",
+    "version": "2026-11-22-evidence-v1",
+    "description": "Each scenario combines event frequency, conditional success, and component-level primary and secondary loss. Launch-Day DDoS is measured per seven-day launch event; the other three scenarios are annual.",
+    "formula": "Loss = material loss events x (primary loss + secondary-effect indicator x secondary loss)",
+    "sampling": "Triangular low / most-likely / high inputs; 10,000 trials with fixed seed 20261124. Annual event counts use a Poisson draw on threat event frequency, thinned by conditional success.",
+    "controlRule": "Each control multiplies only the factors it genuinely influences by (1 - effectiveness); effectiveness is sampled from its low / likely / high range and stacks multiplicatively. Baseline and residual runs share the same random draws, so differences come only from controls.",
+    "costRule": "Launch event view charges the full first-year cost (one-time + annual + per-launch) to the launch event, a conservative choice. Annual view uses annual cost + one-time cost amortized over 3 years + per-launch cost x 1 launch per year.",
+    "disclaimer": "This is a team-designed FAIR-style model for decision support, not an official Open FAIR, NIST, or MITRE assessment. It makes no claim about Take-Two's private controls or architecture.",
+    "sourceIds": [
+      "fair-institute",
+      "nist-csf-2"
+    ],
+    "timing": "Inputs are an ex-ante estimate for the Nov 19-25, 2026 launch window. Launch-week observations (Rockstar services held; PSN disruptions on Nov 18-19) are used as calibration evidence. The same structure applies to the later GTA VI online and PC launches."
+  },
+  "scenarios": {
+    "launch-ddos": {
+      "baseline": {
+        "meta": {
+          "scenarioId": "launch-ddos",
+          "scenarioName": "Launch-Day DDoS",
+          "timeBasis": "launch-event",
+          "timeBasisLabel": "USD per launch event",
+          "timeWindow": "Seven-day GTA VI launch window (Nov 19-25, 2026)",
+          "analysisMode": "launch-event",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0,
+            100000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 10411519.376737066,
+            "p50": 0.0,
+            "p90": 44778658.79875446,
+            "p95": 70612123.60739155,
+            "p99": 104770170.2058205,
+            "max": 162261219.64241868,
+            "probabilityOfLoss": 0.2005,
+            "probabilityAbove50m": 0.0889,
+            "probabilityAbove100m": 0.0129,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2005
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.1673
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0889
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0129
+              }
+            ],
+            "meanGivenLoss": 51927777.44008512,
+            "expectedEvents": 0.2005
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5414116.028735369,
+              10828232.057470739,
+              16242348.086206108,
+              21656464.114941478,
+              27070580.143676847,
+              32484696.172412217,
+              37898812.201147586,
+              43312928.229882956,
+              48727044.258618325,
+              54141160.287353694,
+              59555276.316089064,
+              64969392.34482443,
+              70383508.3735598,
+              75797624.40229517,
+              81211740.43103054,
+              86625856.45976591,
+              92039972.48850128,
+              97454088.51723665,
+              102868204.54597202,
+              108282320.57470739,
+              113696436.60344276,
+              119110552.63217813,
+              124524668.6609135,
+              129938784.68964887,
+              135352900.71838424,
+              140767016.7471196,
+              146181132.77585497,
+              151595248.80459034,
+              157009364.8333257,
+              162423480.86206108
+            ],
+            "counts": [
+              0,
+              1,
+              53,
+              144,
+              198,
+              204,
+              201,
+              166,
+              117,
+              114,
+              90,
+              99,
+              112,
+              98,
+              74,
+              82,
+              59,
+              51,
+              28,
+              36,
+              32,
+              15,
+              14,
+              8,
+              3,
+              3,
+              1,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 7995,
+            "zeroShare": 0.7995
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 10411519.376737066,
+            "p50": 0.0,
+            "p90": 44778658.79875446,
+            "p95": 70612123.60739155,
+            "p99": 104770170.2058205,
+            "max": 162261219.64241868,
+            "probabilityOfLoss": 0.2005,
+            "probabilityAbove50m": 0.0889,
+            "probabilityAbove100m": 0.0129,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2005
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.1673
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0889
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0129
+              }
+            ],
+            "meanGivenLoss": 51927777.44008512,
+            "expectedEvents": 0.2005
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5414116.028735369,
+              10828232.057470739,
+              16242348.086206108,
+              21656464.114941478,
+              27070580.143676847,
+              32484696.172412217,
+              37898812.201147586,
+              43312928.229882956,
+              48727044.258618325,
+              54141160.287353694,
+              59555276.316089064,
+              64969392.34482443,
+              70383508.3735598,
+              75797624.40229517,
+              81211740.43103054,
+              86625856.45976591,
+              92039972.48850128,
+              97454088.51723665,
+              102868204.54597202,
+              108282320.57470739,
+              113696436.60344276,
+              119110552.63217813,
+              124524668.6609135,
+              129938784.68964887,
+              135352900.71838424,
+              140767016.7471196,
+              146181132.77585497,
+              151595248.80459034,
+              157009364.8333257,
+              162423480.86206108
+            ],
+            "counts": [
+              0,
+              1,
+              53,
+              144,
+              198,
+              204,
+              201,
+              166,
+              117,
+              114,
+              90,
+              99,
+              112,
+              98,
+              74,
+              82,
+              59,
+              51,
+              28,
+              36,
+              32,
+              15,
+              14,
+              8,
+              3,
+              3,
+              1,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 7995,
+            "zeroShare": 0.7995
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 0.0,
+          "reductionPercent": 0.0,
+          "p95Reduction": 0.0,
+          "p90Reduction": 0.0
+        },
+        "controlEconomics": {
+          "selectedControlIds": [],
+          "timeBasis": "launch-event",
+          "costBasisNote": "Full first-year cost charged to the launch event (conservative).",
+          "estimatedCost": 0,
+          "costRange": {
+            "low": 0,
+            "high": 0
+          },
+          "lossesAvoided": 0.0,
+          "costOfInaction": 0.0,
+          "netBenefit": 0.0,
+          "rosi": null,
+          "p95Reduction": 0.0
+        },
+        "sensitivity": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material degradation)",
+            "correlation": 0.14423682735896634
+          },
+          {
+            "key": "attackProbability",
+            "name": "Probability of a material DDoS attempt",
+            "correlation": 0.05726426717543647
+          },
+          {
+            "key": "outageHours",
+            "name": "Material degradation duration",
+            "correlation": 0.028512837580972273
+          },
+          {
+            "key": "reputationLoss",
+            "name": "Reputational and future-demand loss",
+            "correlation": 0.021940903923236013
+          },
+          {
+            "key": "hourlyRevenueAtRisk",
+            "name": "Launch revenue at risk per hour",
+            "correlation": 0.014595419341668693
+          }
+        ],
+        "tornado": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material degradation)",
+            "lowValue": 0.1,
+            "highValue": 0.45,
+            "meanAtLow": 3866703.9130525948,
+            "meanAtHigh": 17588139.083094187,
+            "swing": 13721435.170041593
+          },
+          {
+            "key": "reputationLoss",
+            "name": "Reputational and future-demand loss",
+            "lowValue": 3000000,
+            "highValue": 90000000,
+            "meanAtLow": 7110605.564171719,
+            "meanAtHigh": 15375605.564171717,
+            "swing": 8264999.999999997
+          },
+          {
+            "key": "outageHours",
+            "name": "Material degradation duration",
+            "lowValue": 2,
+            "highValue": 36,
+            "meanAtLow": 7883688.048192144,
+            "meanAtHigh": 14260572.867130825,
+            "swing": 6376884.818938681
+          },
+          {
+            "key": "attackProbability",
+            "name": "Probability of a material DDoS attempt",
+            "lowValue": 0.5,
+            "highValue": 0.95,
+            "meanAtLow": 7092333.646640051,
+            "meanAtHigh": 13142287.658378936,
+            "swing": 6049954.011738885
+          },
+          {
+            "key": "refundsMakeGoods",
+            "name": "Refunds, credits, and make-good offers",
+            "lowValue": 1000000,
+            "highValue": 30000000,
+            "meanAtLow": 8212137.069417982,
+            "meanAtHigh": 14026637.069417981,
+            "swing": 5814499.999999999
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        }
+      },
+      "recommended": {
+        "meta": {
+          "scenarioId": "launch-ddos",
+          "scenarioName": "Launch-Day DDoS",
+          "timeBasis": "launch-event",
+          "timeBasisLabel": "USD per launch event",
+          "timeWindow": "Seven-day GTA VI launch window (Nov 19-25, 2026)",
+          "analysisMode": "launch-event",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0,
+            100000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 10411519.376737066,
+            "p50": 0.0,
+            "p90": 44778658.79875446,
+            "p95": 70612123.60739155,
+            "p99": 104770170.2058205,
+            "max": 162261219.64241868,
+            "probabilityOfLoss": 0.2005,
+            "probabilityAbove50m": 0.0889,
+            "probabilityAbove100m": 0.0129,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2005
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.1673
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0889
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0129
+              }
+            ],
+            "meanGivenLoss": 51927777.44008512,
+            "expectedEvents": 0.2005
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5414116.028735369,
+              10828232.057470739,
+              16242348.086206108,
+              21656464.114941478,
+              27070580.143676847,
+              32484696.172412217,
+              37898812.201147586,
+              43312928.229882956,
+              48727044.258618325,
+              54141160.287353694,
+              59555276.316089064,
+              64969392.34482443,
+              70383508.3735598,
+              75797624.40229517,
+              81211740.43103054,
+              86625856.45976591,
+              92039972.48850128,
+              97454088.51723665,
+              102868204.54597202,
+              108282320.57470739,
+              113696436.60344276,
+              119110552.63217813,
+              124524668.6609135,
+              129938784.68964887,
+              135352900.71838424,
+              140767016.7471196,
+              146181132.77585497,
+              151595248.80459034,
+              157009364.8333257,
+              162423480.86206108
+            ],
+            "counts": [
+              0,
+              1,
+              53,
+              144,
+              198,
+              204,
+              201,
+              166,
+              117,
+              114,
+              90,
+              99,
+              112,
+              98,
+              74,
+              82,
+              59,
+              51,
+              28,
+              36,
+              32,
+              15,
+              14,
+              8,
+              3,
+              3,
+              1,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 7995,
+            "zeroShare": 0.7995
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 1739285.5893020718,
+            "p50": 0.0,
+            "p90": 0.0,
+            "p95": 0.0,
+            "p99": 59794181.862941414,
+            "max": 116480886.54495543,
+            "probabilityOfLoss": 0.0459,
+            "probabilityAbove50m": 0.0131,
+            "probabilityAbove100m": 0.0007,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.0452
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0268
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0131
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0007
+              }
+            ],
+            "meanGivenLoss": 37892932.22880331,
+            "expectedEvents": 0.0459
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5414116.028735369,
+              10828232.057470739,
+              16242348.086206108,
+              21656464.114941478,
+              27070580.143676847,
+              32484696.172412217,
+              37898812.201147586,
+              43312928.229882956,
+              48727044.258618325,
+              54141160.287353694,
+              59555276.316089064,
+              64969392.34482443,
+              70383508.3735598,
+              75797624.40229517,
+              81211740.43103054,
+              86625856.45976591,
+              92039972.48850128,
+              97454088.51723665,
+              102868204.54597202,
+              108282320.57470739,
+              113696436.60344276,
+              119110552.63217813,
+              124524668.6609135,
+              129938784.68964887,
+              135352900.71838424,
+              140767016.7471196,
+              146181132.77585497,
+              151595248.80459034,
+              157009364.8333257,
+              162423480.86206108
+            ],
+            "counts": [
+              0,
+              12,
+              76,
+              61,
+              66,
+              47,
+              28,
+              18,
+              17,
+              17,
+              14,
+              25,
+              14,
+              12,
+              16,
+              11,
+              10,
+              6,
+              5,
+              2,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "zeroCount": 9541,
+            "zeroShare": 0.9541
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 8672233.787434993,
+          "reductionPercent": 0.8329460354087956,
+          "p95Reduction": 70612123.60739155,
+          "p90Reduction": 44778658.79875446
+        },
+        "controlEconomics": {
+          "selectedControlIds": [
+            "managed-ddos-protection",
+            "app-abuse-protection",
+            "launch-resilience-testing",
+            "launch-war-room"
+          ],
+          "timeBasis": "launch-event",
+          "costBasisNote": "Full first-year cost charged to the launch event (conservative).",
+          "estimatedCost": 3400000.0,
+          "costRange": {
+            "low": 1750000.0,
+            "high": 6500000.0
+          },
+          "lossesAvoided": 8672233.787434993,
+          "costOfInaction": 8672233.787434993,
+          "netBenefit": 5272233.787434993,
+          "rosi": 1.55065699630441,
+          "p95Reduction": 70612123.60739155
+        },
+        "sensitivity": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material degradation)",
+            "correlation": 0.14423682735896634
+          },
+          {
+            "key": "attackProbability",
+            "name": "Probability of a material DDoS attempt",
+            "correlation": 0.05726426717543647
+          },
+          {
+            "key": "outageHours",
+            "name": "Material degradation duration",
+            "correlation": 0.028512837580972273
+          },
+          {
+            "key": "reputationLoss",
+            "name": "Reputational and future-demand loss",
+            "correlation": 0.021940903923236013
+          },
+          {
+            "key": "hourlyRevenueAtRisk",
+            "name": "Launch revenue at risk per hour",
+            "correlation": 0.014595419341668693
+          }
+        ],
+        "tornado": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material degradation)",
+            "lowValue": 0.1,
+            "highValue": 0.45,
+            "meanAtLow": 3866703.9130525948,
+            "meanAtHigh": 17588139.083094187,
+            "swing": 13721435.170041593
+          },
+          {
+            "key": "reputationLoss",
+            "name": "Reputational and future-demand loss",
+            "lowValue": 3000000,
+            "highValue": 90000000,
+            "meanAtLow": 7110605.564171719,
+            "meanAtHigh": 15375605.564171717,
+            "swing": 8264999.999999997
+          },
+          {
+            "key": "outageHours",
+            "name": "Material degradation duration",
+            "lowValue": 2,
+            "highValue": 36,
+            "meanAtLow": 7883688.048192144,
+            "meanAtHigh": 14260572.867130825,
+            "swing": 6376884.818938681
+          },
+          {
+            "key": "attackProbability",
+            "name": "Probability of a material DDoS attempt",
+            "lowValue": 0.5,
+            "highValue": 0.95,
+            "meanAtLow": 7092333.646640051,
+            "meanAtHigh": 13142287.658378936,
+            "swing": 6049954.011738885
+          },
+          {
+            "key": "refundsMakeGoods",
+            "name": "Refunds, credits, and make-good offers",
+            "lowValue": 1000000,
+            "highValue": 30000000,
+            "meanAtLow": 8212137.069417982,
+            "meanAtHigh": 14026637.069417981,
+            "swing": 5814499.999999999
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 72.5,
+            "band": "Conditional readiness"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 1.0,
+              "currentPoints": 12.5,
+              "proposedPoints": 25.0,
+              "drivers": [
+                "managed-ddos-protection",
+                "app-abuse-protection"
+              ],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 1.0,
+              "currentPoints": 12.5,
+              "proposedPoints": 25.0,
+              "drivers": [
+                "launch-resilience-testing"
+              ],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [
+                "launch-war-room"
+              ],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 1.0,
+              "currentPoints": 7.5,
+              "proposedPoints": 15.0,
+              "drivers": [
+                "launch-war-room"
+              ],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        },
+        "controlBreakdown": [
+          {
+            "controlId": "managed-ddos-protection",
+            "standaloneLossReduction": 6100355.954019865,
+            "standaloneP95Reduction": 34024863.99185362,
+            "comparableCost": 1500000.0,
+            "standaloneNetBenefit": 4600355.954019865,
+            "standaloneRosi": 3.0669039693465767
+          },
+          {
+            "controlId": "app-abuse-protection",
+            "standaloneLossReduction": 3863005.369238425,
+            "standaloneP95Reduction": 15486282.329553075,
+            "comparableCost": 800000.0,
+            "standaloneNetBenefit": 3063005.369238425,
+            "standaloneRosi": 3.8287567115480314
+          },
+          {
+            "controlId": "launch-resilience-testing",
+            "standaloneLossReduction": 2426706.702607671,
+            "standaloneP95Reduction": 7549452.869708344,
+            "comparableCost": 500000.0,
+            "standaloneNetBenefit": 1926706.7026076708,
+            "standaloneRosi": 3.8534134052153415
+          },
+          {
+            "controlId": "launch-war-room",
+            "standaloneLossReduction": 1646738.4884054512,
+            "standaloneP95Reduction": 10832250.83812359,
+            "comparableCost": 600000.0,
+            "standaloneNetBenefit": 1046738.4884054512,
+            "standaloneRosi": 1.7445641473424187
+          }
+        ]
+      }
+    },
+    "source-code-theft": {
+      "baseline": {
+        "meta": {
+          "scenarioId": "source-code-theft",
+          "scenarioName": "Build & Source Code Theft",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0,
+            100000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 5880247.315281404,
+            "p50": 0.0,
+            "p90": 23271403.452705454,
+            "p95": 43793810.893208034,
+            "p99": 69752497.87490316,
+            "max": 195171767.52905393,
+            "probabilityOfLoss": 0.1915,
+            "probabilityAbove50m": 0.0368,
+            "probabilityAbove100m": 0.0036,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.1633
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0965
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0368
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0036
+              }
+            ],
+            "meanGivenLoss": 30706252.299119603,
+            "expectedEvents": 0.2155
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              6512231.309886099,
+              13024462.619772198,
+              19536693.929658297,
+              26048925.239544395,
+              32561156.549430493,
+              39073387.859316595,
+              45585619.16920269,
+              52097850.47908879,
+              58610081.78897489,
+              65122313.09886099,
+              71634544.40874709,
+              78146775.71863319,
+              84659007.02851929,
+              91171238.33840539,
+              97683469.64829148,
+              104195700.95817758,
+              110707932.26806368,
+              117220163.57794978,
+              123732394.88783588,
+              130244626.19772197,
+              136756857.5076081,
+              143269088.81749418,
+              149781320.12738028,
+              156293551.43726638,
+              162805782.74715248,
+              169318014.05703858,
+              175830245.36692467,
+              182342476.67681077,
+              188854707.98669687,
+              195366939.29658297
+            ],
+            "counts": [
+              7,
+              678,
+              184,
+              94,
+              168,
+              180,
+              145,
+              137,
+              122,
+              70,
+              36,
+              19,
+              19,
+              12,
+              7,
+              9,
+              10,
+              7,
+              4,
+              0,
+              3,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 8085,
+            "zeroShare": 0.8085
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 5880247.315281404,
+            "p50": 0.0,
+            "p90": 23271403.452705454,
+            "p95": 43793810.893208034,
+            "p99": 69752497.87490316,
+            "max": 195171767.52905393,
+            "probabilityOfLoss": 0.1915,
+            "probabilityAbove50m": 0.0368,
+            "probabilityAbove100m": 0.0036,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.1633
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0965
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0368
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0036
+              }
+            ],
+            "meanGivenLoss": 30706252.299119603,
+            "expectedEvents": 0.2155
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              6512231.309886099,
+              13024462.619772198,
+              19536693.929658297,
+              26048925.239544395,
+              32561156.549430493,
+              39073387.859316595,
+              45585619.16920269,
+              52097850.47908879,
+              58610081.78897489,
+              65122313.09886099,
+              71634544.40874709,
+              78146775.71863319,
+              84659007.02851929,
+              91171238.33840539,
+              97683469.64829148,
+              104195700.95817758,
+              110707932.26806368,
+              117220163.57794978,
+              123732394.88783588,
+              130244626.19772197,
+              136756857.5076081,
+              143269088.81749418,
+              149781320.12738028,
+              156293551.43726638,
+              162805782.74715248,
+              169318014.05703858,
+              175830245.36692467,
+              182342476.67681077,
+              188854707.98669687,
+              195366939.29658297
+            ],
+            "counts": [
+              7,
+              678,
+              184,
+              94,
+              168,
+              180,
+              145,
+              137,
+              122,
+              70,
+              36,
+              19,
+              19,
+              12,
+              7,
+              9,
+              10,
+              7,
+              4,
+              0,
+              3,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 8085,
+            "zeroShare": 0.8085
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 0.0,
+          "reductionPercent": 0.0,
+          "p95Reduction": 0.0,
+          "p90Reduction": 0.0
+        },
+        "controlEconomics": {
+          "selectedControlIds": [],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 0,
+          "costRange": {
+            "low": 0,
+            "high": 0
+          },
+          "lossesAvoided": 0.0,
+          "costOfInaction": 0.0,
+          "netBenefit": 0.0,
+          "rosi": null,
+          "p95Reduction": 0.0
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Targeted intrusion attempts reaching a foothold",
+            "correlation": 0.16193152065242555
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material code or build exfiltration)",
+            "correlation": 0.11626942699847113
+          },
+          {
+            "key": "securityRebuild",
+            "name": "Credential resets and pipeline rebuild",
+            "correlation": 0.014301961822799497
+          },
+          {
+            "key": "marketingDisruption",
+            "name": "Marketing and reveal-value disruption",
+            "correlation": 0.01352307960163683
+          },
+          {
+            "key": "legalLawEnforcement",
+            "name": "Legal and law-enforcement support",
+            "correlation": 0.011442757076741394
+          }
+        ],
+        "tornado": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Targeted intrusion attempts reaching a foothold",
+            "lowValue": 0.5,
+            "highValue": 3.0,
+            "meanAtLow": 1657964.5840897453,
+            "meanAtHigh": 11427128.51774311,
+            "swing": 9769163.933653366
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material code or build exfiltration)",
+            "lowValue": 0.05,
+            "highValue": 0.25,
+            "meanAtLow": 2056848.4060143463,
+            "meanAtHigh": 10740488.406917877,
+            "swing": 8683640.000903532
+          },
+          {
+            "key": "marketingDisruption",
+            "name": "Marketing and reveal-value disruption",
+            "lowValue": 2000000,
+            "highValue": 50000000,
+            "meanAtLow": 3948532.603924687,
+            "meanAtHigh": 9223732.603924688,
+            "swing": 5275200.000000001
+          },
+          {
+            "key": "competitiveIPLoss",
+            "name": "Competitive, cheating, and piracy exposure",
+            "lowValue": 1000000,
+            "highValue": 30000000,
+            "meanAtLow": 4755224.407867183,
+            "meanAtHigh": 7942324.407867183,
+            "swing": 3187100.0
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of public leak or extortion effects",
+            "lowValue": 0.3,
+            "highValue": 0.75,
+            "meanAtLow": 4448514.367530846,
+            "meanAtHigh": 7620714.5127955815,
+            "swing": 3172200.1452647354
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        }
+      },
+      "recommended": {
+        "meta": {
+          "scenarioId": "source-code-theft",
+          "scenarioName": "Build & Source Code Theft",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0,
+            100000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 5880247.315281404,
+            "p50": 0.0,
+            "p90": 23271403.452705454,
+            "p95": 43793810.893208034,
+            "p99": 69752497.87490316,
+            "max": 195171767.52905393,
+            "probabilityOfLoss": 0.1915,
+            "probabilityAbove50m": 0.0368,
+            "probabilityAbove100m": 0.0036,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.1633
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0965
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0368
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0036
+              }
+            ],
+            "meanGivenLoss": 30706252.299119603,
+            "expectedEvents": 0.2155
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              6512231.309886099,
+              13024462.619772198,
+              19536693.929658297,
+              26048925.239544395,
+              32561156.549430493,
+              39073387.859316595,
+              45585619.16920269,
+              52097850.47908879,
+              58610081.78897489,
+              65122313.09886099,
+              71634544.40874709,
+              78146775.71863319,
+              84659007.02851929,
+              91171238.33840539,
+              97683469.64829148,
+              104195700.95817758,
+              110707932.26806368,
+              117220163.57794978,
+              123732394.88783588,
+              130244626.19772197,
+              136756857.5076081,
+              143269088.81749418,
+              149781320.12738028,
+              156293551.43726638,
+              162805782.74715248,
+              169318014.05703858,
+              175830245.36692467,
+              182342476.67681077,
+              188854707.98669687,
+              195366939.29658297
+            ],
+            "counts": [
+              7,
+              678,
+              184,
+              94,
+              168,
+              180,
+              145,
+              137,
+              122,
+              70,
+              36,
+              19,
+              19,
+              12,
+              7,
+              9,
+              10,
+              7,
+              4,
+              0,
+              3,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              2
+            ],
+            "zeroCount": 8085,
+            "zeroShare": 0.8085
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 1837431.7263944154,
+            "p50": 0.0,
+            "p90": 0.0,
+            "p95": 10820885.536852483,
+            "p99": 49826699.09151476,
+            "max": 188766310.54737163,
+            "probabilityOfLoss": 0.0647,
+            "probabilityAbove50m": 0.0099,
+            "probabilityAbove100m": 0.0008,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.0532
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0312
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0099
+              },
+              {
+                "threshold": 100000000.0,
+                "probability": 0.0008
+              }
+            ],
+            "meanGivenLoss": 28399253.885539647,
+            "expectedEvents": 0.068
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              6512231.309886099,
+              13024462.619772198,
+              19536693.929658297,
+              26048925.239544395,
+              32561156.549430493,
+              39073387.859316595,
+              45585619.16920269,
+              52097850.47908879,
+              58610081.78897489,
+              65122313.09886099,
+              71634544.40874709,
+              78146775.71863319,
+              84659007.02851929,
+              91171238.33840539,
+              97683469.64829148,
+              104195700.95817758,
+              110707932.26806368,
+              117220163.57794978,
+              123732394.88783588,
+              130244626.19772197,
+              136756857.5076081,
+              143269088.81749418,
+              149781320.12738028,
+              156293551.43726638,
+              162805782.74715248,
+              169318014.05703858,
+              175830245.36692467,
+              182342476.67681077,
+              188854707.98669687,
+              195366939.29658297
+            ],
+            "counts": [
+              2,
+              250,
+              56,
+              37,
+              48,
+              74,
+              56,
+              36,
+              43,
+              19,
+              10,
+              3,
+              2,
+              2,
+              1,
+              4,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            "zeroCount": 9353,
+            "zeroShare": 0.9353
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 4042815.588886989,
+          "reductionPercent": 0.6875247539981261,
+          "p95Reduction": 32972925.35635555,
+          "p90Reduction": 23271403.452705454
+        },
+        "controlEconomics": {
+          "selectedControlIds": [
+            "phishing-resistant-mfa",
+            "build-access-pam"
+          ],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 1266666.6666666667,
+          "costRange": {
+            "low": 733333.3333333334,
+            "high": 2300000.0
+          },
+          "lossesAvoided": 4042815.588886989,
+          "costOfInaction": 4042815.588886989,
+          "netBenefit": 2776148.9222203223,
+          "rosi": 2.1916965175423595,
+          "p95Reduction": 32972925.35635555
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Targeted intrusion attempts reaching a foothold",
+            "correlation": 0.16193152065242555
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material code or build exfiltration)",
+            "correlation": 0.11626942699847113
+          },
+          {
+            "key": "securityRebuild",
+            "name": "Credential resets and pipeline rebuild",
+            "correlation": 0.014301961822799497
+          },
+          {
+            "key": "marketingDisruption",
+            "name": "Marketing and reveal-value disruption",
+            "correlation": 0.01352307960163683
+          },
+          {
+            "key": "legalLawEnforcement",
+            "name": "Legal and law-enforcement support",
+            "correlation": 0.011442757076741394
+          }
+        ],
+        "tornado": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Targeted intrusion attempts reaching a foothold",
+            "lowValue": 0.5,
+            "highValue": 3.0,
+            "meanAtLow": 1657964.5840897453,
+            "meanAtHigh": 11427128.51774311,
+            "swing": 9769163.933653366
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material code or build exfiltration)",
+            "lowValue": 0.05,
+            "highValue": 0.25,
+            "meanAtLow": 2056848.4060143463,
+            "meanAtHigh": 10740488.406917877,
+            "swing": 8683640.000903532
+          },
+          {
+            "key": "marketingDisruption",
+            "name": "Marketing and reveal-value disruption",
+            "lowValue": 2000000,
+            "highValue": 50000000,
+            "meanAtLow": 3948532.603924687,
+            "meanAtHigh": 9223732.603924688,
+            "swing": 5275200.000000001
+          },
+          {
+            "key": "competitiveIPLoss",
+            "name": "Competitive, cheating, and piracy exposure",
+            "lowValue": 1000000,
+            "highValue": 30000000,
+            "meanAtLow": 4755224.407867183,
+            "meanAtHigh": 7942324.407867183,
+            "swing": 3187100.0
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of public leak or extortion effects",
+            "lowValue": 0.3,
+            "highValue": 0.75,
+            "meanAtLow": 4448514.367530846,
+            "meanAtHigh": 7620714.5127955815,
+            "swing": 3172200.1452647354
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        },
+        "controlBreakdown": [
+          {
+            "controlId": "phishing-resistant-mfa",
+            "standaloneLossReduction": 2903615.9668300757,
+            "standaloneP95Reduction": 20251106.967897587,
+            "comparableCost": 266666.6666666667,
+            "standaloneNetBenefit": 2636949.300163409,
+            "standaloneRosi": 9.888559875612783
+          },
+          {
+            "controlId": "build-access-pam",
+            "standaloneLossReduction": 2479524.9533657664,
+            "standaloneP95Reduction": 14447523.064806849,
+            "comparableCost": 1000000.0,
+            "standaloneNetBenefit": 1479524.9533657664,
+            "standaloneRosi": 1.4795249533657664
+          }
+        ]
+      }
+    },
+    "insider-leak": {
+      "baseline": {
+        "meta": {
+          "scenarioId": "insider-leak",
+          "scenarioName": "Insider or Contractor Leak",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 7501062.998185713,
+            "p50": 0.0,
+            "p90": 22817026.68074493,
+            "p95": 31721879.320972256,
+            "p99": 60454328.054710664,
+            "max": 157651520.29587424,
+            "probabilityOfLoss": 0.4722,
+            "probabilityAbove50m": 0.0188,
+            "probabilityAbove100m": 0.0014,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.254
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.082
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0188
+              }
+            ],
+            "meanGivenLoss": 15885351.542112904,
+            "expectedEvents": 0.6808
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5260305.7272056695,
+              10520611.454411339,
+              15780917.181617009,
+              21041222.908822678,
+              26301528.63602835,
+              31561834.363234017,
+              36822140.090439685,
+              42082445.817645356,
+              47342751.54485103,
+              52603057.2720567,
+              57863362.99926236,
+              63123668.726468034,
+              68383974.4536737,
+              73644280.18087937,
+              78904585.90808505,
+              84164891.63529071,
+              89425197.36249638,
+              94685503.08970205,
+              99945808.81690772,
+              105206114.5441134,
+              110466420.27131906,
+              115726725.99852473,
+              120987031.7257304,
+              126247337.45293607,
+              131507643.18014173,
+              136767948.9073474,
+              142028254.63455307,
+              147288560.36175874,
+              152548866.0889644,
+              157809171.8161701
+            ],
+            "counts": [
+              914,
+              1341,
+              785,
+              534,
+              423,
+              217,
+              106,
+              111,
+              60,
+              70,
+              50,
+              28,
+              19,
+              18,
+              7,
+              6,
+              11,
+              6,
+              2,
+              8,
+              2,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "zeroCount": 5278,
+            "zeroShare": 0.5278
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 7501062.998185713,
+            "p50": 0.0,
+            "p90": 22817026.68074493,
+            "p95": 31721879.320972256,
+            "p99": 60454328.054710664,
+            "max": 157651520.29587424,
+            "probabilityOfLoss": 0.4722,
+            "probabilityAbove50m": 0.0188,
+            "probabilityAbove100m": 0.0014,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.254
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.082
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0188
+              }
+            ],
+            "meanGivenLoss": 15885351.542112904,
+            "expectedEvents": 0.6808
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5260305.7272056695,
+              10520611.454411339,
+              15780917.181617009,
+              21041222.908822678,
+              26301528.63602835,
+              31561834.363234017,
+              36822140.090439685,
+              42082445.817645356,
+              47342751.54485103,
+              52603057.2720567,
+              57863362.99926236,
+              63123668.726468034,
+              68383974.4536737,
+              73644280.18087937,
+              78904585.90808505,
+              84164891.63529071,
+              89425197.36249638,
+              94685503.08970205,
+              99945808.81690772,
+              105206114.5441134,
+              110466420.27131906,
+              115726725.99852473,
+              120987031.7257304,
+              126247337.45293607,
+              131507643.18014173,
+              136767948.9073474,
+              142028254.63455307,
+              147288560.36175874,
+              152548866.0889644,
+              157809171.8161701
+            ],
+            "counts": [
+              914,
+              1341,
+              785,
+              534,
+              423,
+              217,
+              106,
+              111,
+              60,
+              70,
+              50,
+              28,
+              19,
+              18,
+              7,
+              6,
+              11,
+              6,
+              2,
+              8,
+              2,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "zeroCount": 5278,
+            "zeroShare": 0.5278
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 0.0,
+          "reductionPercent": 0.0,
+          "p95Reduction": 0.0,
+          "p90Reduction": 0.0
+        },
+        "controlEconomics": {
+          "selectedControlIds": [],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 0,
+          "costRange": {
+            "low": 0,
+            "high": 0
+          },
+          "lossesAvoided": 0.0,
+          "costOfInaction": 0.0,
+          "netBenefit": 0.0,
+          "rosi": null,
+          "p95Reduction": 0.0
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Insider disclosure incidents with material potential",
+            "correlation": 0.2181828853484268
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (leak becomes public or harmful)",
+            "correlation": 0.18982683654471955
+          },
+          {
+            "key": "businessDisruption",
+            "name": "Business and marketing-plan disruption",
+            "correlation": 0.061693203729734566
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "correlation": 0.029420638819470716
+          },
+          {
+            "key": "reputationMarketing",
+            "name": "Reputational and marketing-value loss",
+            "correlation": 0.026303160397234997
+          }
+        ],
+        "tornado": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Insider disclosure incidents with material potential",
+            "lowValue": 1.0,
+            "highValue": 6.0,
+            "meanAtLow": 2183768.313094755,
+            "meanAtHigh": 13468588.366049062,
+            "swing": 11284820.052954307
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (leak becomes public or harmful)",
+            "lowValue": 0.08,
+            "highValue": 0.35,
+            "meanAtLow": 2841078.9989966033,
+            "meanAtHigh": 12787867.962041622,
+            "swing": 9946788.96304502
+          },
+          {
+            "key": "reputationMarketing",
+            "name": "Reputational and marketing-value loss",
+            "lowValue": 500000,
+            "highValue": 25000000,
+            "meanAtLow": 4742155.230490739,
+            "meanAtHigh": 11908405.230490739,
+            "swing": 7166249.999999999
+          },
+          {
+            "key": "businessDisruption",
+            "name": "Business and marketing-plan disruption",
+            "lowValue": 300000,
+            "highValue": 6000000,
+            "meanAtLow": 5948753.769882272,
+            "meanAtHigh": 9898853.769882273,
+            "swing": 3950100.000000001
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "lowValue": 0.25,
+            "highValue": 0.6,
+            "meanAtLow": 5999674.504230917,
+            "meanAtHigh": 9177698.56034837,
+            "swing": 3178024.0561174517
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        }
+      },
+      "recommended": {
+        "meta": {
+          "scenarioId": "insider-leak",
+          "scenarioName": "Insider or Contractor Leak",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            10000000.0,
+            25000000.0,
+            50000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 7501062.998185713,
+            "p50": 0.0,
+            "p90": 22817026.68074493,
+            "p95": 31721879.320972256,
+            "p99": 60454328.054710664,
+            "max": 157651520.29587424,
+            "probabilityOfLoss": 0.4722,
+            "probabilityAbove50m": 0.0188,
+            "probabilityAbove100m": 0.0014,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.254
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.082
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0188
+              }
+            ],
+            "meanGivenLoss": 15885351.542112904,
+            "expectedEvents": 0.6808
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5260305.7272056695,
+              10520611.454411339,
+              15780917.181617009,
+              21041222.908822678,
+              26301528.63602835,
+              31561834.363234017,
+              36822140.090439685,
+              42082445.817645356,
+              47342751.54485103,
+              52603057.2720567,
+              57863362.99926236,
+              63123668.726468034,
+              68383974.4536737,
+              73644280.18087937,
+              78904585.90808505,
+              84164891.63529071,
+              89425197.36249638,
+              94685503.08970205,
+              99945808.81690772,
+              105206114.5441134,
+              110466420.27131906,
+              115726725.99852473,
+              120987031.7257304,
+              126247337.45293607,
+              131507643.18014173,
+              136767948.9073474,
+              142028254.63455307,
+              147288560.36175874,
+              152548866.0889644,
+              157809171.8161701
+            ],
+            "counts": [
+              914,
+              1341,
+              785,
+              534,
+              423,
+              217,
+              106,
+              111,
+              60,
+              70,
+              50,
+              28,
+              19,
+              18,
+              7,
+              6,
+              11,
+              6,
+              2,
+              8,
+              2,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "zeroCount": 5278,
+            "zeroShare": 0.5278
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 3290823.0811585295,
+            "p50": 0.0,
+            "p90": 11834614.3494943,
+            "p95": 19030600.264609773,
+            "p99": 34732683.041380145,
+            "max": 126121216.2366994,
+            "probabilityOfLoss": 0.2788,
+            "probabilityAbove50m": 0.0033,
+            "probabilityAbove100m": 0.0002,
+            "exceedance": [
+              {
+                "threshold": 10000000.0,
+                "probability": 0.1133
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0252
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0033
+              }
+            ],
+            "meanGivenLoss": 11803526.116063595,
+            "expectedEvents": 0.3364
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              5260305.7272056695,
+              10520611.454411339,
+              15780917.181617009,
+              21041222.908822678,
+              26301528.63602835,
+              31561834.363234017,
+              36822140.090439685,
+              42082445.817645356,
+              47342751.54485103,
+              52603057.2720567,
+              57863362.99926236,
+              63123668.726468034,
+              68383974.4536737,
+              73644280.18087937,
+              78904585.90808505,
+              84164891.63529071,
+              89425197.36249638,
+              94685503.08970205,
+              99945808.81690772,
+              105206114.5441134,
+              110466420.27131906,
+              115726725.99852473,
+              120987031.7257304,
+              126247337.45293607,
+              131507643.18014173,
+              136767948.9073474,
+              142028254.63455307,
+              147288560.36175874,
+              152548866.0889644,
+              157809171.8161701
+            ],
+            "counts": [
+              760,
+              927,
+              389,
+              301,
+              198,
+              96,
+              26,
+              30,
+              19,
+              17,
+              10,
+              10,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "zeroCount": 7212,
+            "zeroShare": 0.7212
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 4210239.917027183,
+          "reductionPercent": 0.5612857695030047,
+          "p95Reduction": 12691279.056362484,
+          "p90Reduction": 10982412.33125063
+        },
+        "controlEconomics": {
+          "selectedControlIds": [
+            "insider-risk-monitoring",
+            "vendor-access-governance"
+          ],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 1400000.0,
+          "costRange": {
+            "low": 800000.0,
+            "high": 2500000.0
+          },
+          "lossesAvoided": 4210239.917027183,
+          "costOfInaction": 4210239.917027183,
+          "netBenefit": 2810239.917027183,
+          "rosi": 2.007314226447988,
+          "p95Reduction": 12691279.056362484
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Insider disclosure incidents with material potential",
+            "correlation": 0.2181828853484268
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (leak becomes public or harmful)",
+            "correlation": 0.18982683654471955
+          },
+          {
+            "key": "businessDisruption",
+            "name": "Business and marketing-plan disruption",
+            "correlation": 0.061693203729734566
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "correlation": 0.029420638819470716
+          },
+          {
+            "key": "reputationMarketing",
+            "name": "Reputational and marketing-value loss",
+            "correlation": 0.026303160397234997
+          }
+        ],
+        "tornado": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Insider disclosure incidents with material potential",
+            "lowValue": 1.0,
+            "highValue": 6.0,
+            "meanAtLow": 2183768.313094755,
+            "meanAtHigh": 13468588.366049062,
+            "swing": 11284820.052954307
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (leak becomes public or harmful)",
+            "lowValue": 0.08,
+            "highValue": 0.35,
+            "meanAtLow": 2841078.9989966033,
+            "meanAtHigh": 12787867.962041622,
+            "swing": 9946788.96304502
+          },
+          {
+            "key": "reputationMarketing",
+            "name": "Reputational and marketing-value loss",
+            "lowValue": 500000,
+            "highValue": 25000000,
+            "meanAtLow": 4742155.230490739,
+            "meanAtHigh": 11908405.230490739,
+            "swing": 7166249.999999999
+          },
+          {
+            "key": "businessDisruption",
+            "name": "Business and marketing-plan disruption",
+            "lowValue": 300000,
+            "highValue": 6000000,
+            "meanAtLow": 5948753.769882272,
+            "meanAtHigh": 9898853.769882273,
+            "swing": 3950100.000000001
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "lowValue": 0.25,
+            "highValue": 0.6,
+            "meanAtLow": 5999674.504230917,
+            "meanAtHigh": 9177698.56034837,
+            "swing": 3178024.0561174517
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        },
+        "controlBreakdown": [
+          {
+            "controlId": "insider-risk-monitoring",
+            "standaloneLossReduction": 3130802.0367874205,
+            "standaloneP95Reduction": 9269801.607074235,
+            "comparableCost": 900000.0,
+            "standaloneNetBenefit": 2230802.0367874205,
+            "standaloneRosi": 2.4786689297638005
+          },
+          {
+            "controlId": "vendor-access-governance",
+            "standaloneLossReduction": 1836119.2230455903,
+            "standaloneP95Reduction": 5491694.255372733,
+            "comparableCost": 500000.0,
+            "standaloneNetBenefit": 1336119.2230455903,
+            "standaloneRosi": 2.6722384460911806
+          }
+        ]
+      }
+    },
+    "fake-downloads": {
+      "baseline": {
+        "meta": {
+          "scenarioId": "fake-downloads",
+          "scenarioName": "Fake Downloads & Phishing",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            5000000.0,
+            10000000.0,
+            25000000.0,
+            50000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 7384319.376779744,
+            "p50": 3453316.8154696273,
+            "p90": 19350243.655511074,
+            "p95": 31196988.411674965,
+            "p99": 57758783.094242826,
+            "max": 131055257.03309311,
+            "probabilityOfLoss": 0.7457,
+            "probabilityAbove50m": 0.0161,
+            "probabilityAbove100m": 0.0007,
+            "exceedance": [
+              {
+                "threshold": 5000000.0,
+                "probability": 0.3968
+              },
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2094
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0704
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0161
+              }
+            ],
+            "meanGivenLoss": 9902533.695560876,
+            "expectedEvents": 1.5859
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              4372877.07633754,
+              8745754.15267508,
+              13118631.22901262,
+              17491508.30535016,
+              21864385.381687697,
+              26237262.45802524,
+              30610139.534362778,
+              34983016.61070032,
+              39355893.687037855,
+              43728770.763375394,
+              48101647.83971293,
+              52474524.91605048,
+              56847401.99238802,
+              61220279.068725556,
+              65593156.145063095,
+              69966033.22140063,
+              74338910.29773818,
+              78711787.37407571,
+              83084664.45041326,
+              87457541.52675079,
+              91830418.60308833,
+              96203295.67942587,
+              100576172.75576341,
+              104949049.83210096,
+              109321926.90843849,
+              113694803.98477603,
+              118067681.06111357,
+              122440558.13745111,
+              126813435.21378864,
+              131186312.29012619
+            ],
+            "counts": [
+              3076,
+              2010,
+              798,
+              438,
+              271,
+              219,
+              134,
+              127,
+              89,
+              76,
+              45,
+              38,
+              30,
+              26,
+              16,
+              14,
+              11,
+              9,
+              6,
+              7,
+              2,
+              3,
+              5,
+              1,
+              1,
+              0,
+              2,
+              2,
+              0,
+              1
+            ],
+            "zeroCount": 2543,
+            "zeroShare": 0.2543
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 7384319.376779744,
+            "p50": 3453316.8154696273,
+            "p90": 19350243.655511074,
+            "p95": 31196988.411674965,
+            "p99": 57758783.094242826,
+            "max": 131055257.03309311,
+            "probabilityOfLoss": 0.7457,
+            "probabilityAbove50m": 0.0161,
+            "probabilityAbove100m": 0.0007,
+            "exceedance": [
+              {
+                "threshold": 5000000.0,
+                "probability": 0.3968
+              },
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2094
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0704
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0161
+              }
+            ],
+            "meanGivenLoss": 9902533.695560876,
+            "expectedEvents": 1.5859
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              4372877.07633754,
+              8745754.15267508,
+              13118631.22901262,
+              17491508.30535016,
+              21864385.381687697,
+              26237262.45802524,
+              30610139.534362778,
+              34983016.61070032,
+              39355893.687037855,
+              43728770.763375394,
+              48101647.83971293,
+              52474524.91605048,
+              56847401.99238802,
+              61220279.068725556,
+              65593156.145063095,
+              69966033.22140063,
+              74338910.29773818,
+              78711787.37407571,
+              83084664.45041326,
+              87457541.52675079,
+              91830418.60308833,
+              96203295.67942587,
+              100576172.75576341,
+              104949049.83210096,
+              109321926.90843849,
+              113694803.98477603,
+              118067681.06111357,
+              122440558.13745111,
+              126813435.21378864,
+              131186312.29012619
+            ],
+            "counts": [
+              3076,
+              2010,
+              798,
+              438,
+              271,
+              219,
+              134,
+              127,
+              89,
+              76,
+              45,
+              38,
+              30,
+              26,
+              16,
+              14,
+              11,
+              9,
+              6,
+              7,
+              2,
+              3,
+              5,
+              1,
+              1,
+              0,
+              2,
+              2,
+              0,
+              1
+            ],
+            "zeroCount": 2543,
+            "zeroShare": 0.2543
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 0.0,
+          "reductionPercent": 0.0,
+          "p95Reduction": 0.0,
+          "p90Reduction": 0.0
+        },
+        "controlEconomics": {
+          "selectedControlIds": [],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 0,
+          "costRange": {
+            "low": 0,
+            "high": 0
+          },
+          "lossesAvoided": 0.0,
+          "costOfInaction": 0.0,
+          "netBenefit": 0.0,
+          "rosi": null,
+          "p95Reduction": 0.0
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Impersonation campaigns requiring a response",
+            "correlation": 0.2553613116026233
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material player or workforce harm)",
+            "correlation": 0.25291709832236575
+          },
+          {
+            "key": "supportAccountRecovery",
+            "name": "Support and account recovery",
+            "correlation": 0.11868197509350036
+          },
+          {
+            "key": "fraudChargebacks",
+            "name": "Fraud and chargebacks absorbed",
+            "correlation": 0.10378429183078365
+          },
+          {
+            "key": "brandRegulatory",
+            "name": "Brand-trust and regulatory effects",
+            "correlation": 0.04999983265250024
+          }
+        ],
+        "tornado": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material player or workforce harm)",
+            "lowValue": 0.05,
+            "highValue": 0.25,
+            "meanAtLow": 2626095.6397899603,
+            "meanAtHigh": 13154054.54771488,
+            "swing": 10527958.90792492
+          },
+          {
+            "key": "threatEventFrequency",
+            "name": "Impersonation campaigns requiring a response",
+            "lowValue": 4.0,
+            "highValue": 20.0,
+            "meanAtLow": 2644611.672413373,
+            "meanAtHigh": 12976038.314398883,
+            "swing": 10331426.64198551
+          },
+          {
+            "key": "brandRegulatory",
+            "name": "Brand-trust and regulatory effects",
+            "lowValue": 500000,
+            "highValue": 20000000,
+            "meanAtLow": 3649124.604808525,
+            "meanAtHigh": 13685774.604808524,
+            "swing": 10036650.0
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "lowValue": 0.15,
+            "highValue": 0.5,
+            "meanAtLow": 5334720.1890486125,
+            "meanAtHigh": 9590449.996342948,
+            "swing": 4255729.807294335
+          },
+          {
+            "key": "supportAccountRecovery",
+            "name": "Support and account recovery",
+            "lowValue": 100000,
+            "highValue": 2500000,
+            "meanAtLow": 5821017.340490879,
+            "meanAtHigh": 9634377.340490878,
+            "swing": 3813359.999999999
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        }
+      },
+      "recommended": {
+        "meta": {
+          "scenarioId": "fake-downloads",
+          "scenarioName": "Fake Downloads & Phishing",
+          "timeBasis": "annual",
+          "timeBasisLabel": "USD per year",
+          "timeWindow": "Twelve-month period",
+          "analysisMode": "annual",
+          "trials": 10000,
+          "seed": 20261124,
+          "currency": "USD",
+          "thresholds": [
+            5000000.0,
+            10000000.0,
+            25000000.0,
+            50000000.0
+          ]
+        },
+        "baseline": {
+          "metrics": {
+            "mean": 7384319.376779744,
+            "p50": 3453316.8154696273,
+            "p90": 19350243.655511074,
+            "p95": 31196988.411674965,
+            "p99": 57758783.094242826,
+            "max": 131055257.03309311,
+            "probabilityOfLoss": 0.7457,
+            "probabilityAbove50m": 0.0161,
+            "probabilityAbove100m": 0.0007,
+            "exceedance": [
+              {
+                "threshold": 5000000.0,
+                "probability": 0.3968
+              },
+              {
+                "threshold": 10000000.0,
+                "probability": 0.2094
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0704
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0161
+              }
+            ],
+            "meanGivenLoss": 9902533.695560876,
+            "expectedEvents": 1.5859
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              4372877.07633754,
+              8745754.15267508,
+              13118631.22901262,
+              17491508.30535016,
+              21864385.381687697,
+              26237262.45802524,
+              30610139.534362778,
+              34983016.61070032,
+              39355893.687037855,
+              43728770.763375394,
+              48101647.83971293,
+              52474524.91605048,
+              56847401.99238802,
+              61220279.068725556,
+              65593156.145063095,
+              69966033.22140063,
+              74338910.29773818,
+              78711787.37407571,
+              83084664.45041326,
+              87457541.52675079,
+              91830418.60308833,
+              96203295.67942587,
+              100576172.75576341,
+              104949049.83210096,
+              109321926.90843849,
+              113694803.98477603,
+              118067681.06111357,
+              122440558.13745111,
+              126813435.21378864,
+              131186312.29012619
+            ],
+            "counts": [
+              3076,
+              2010,
+              798,
+              438,
+              271,
+              219,
+              134,
+              127,
+              89,
+              76,
+              45,
+              38,
+              30,
+              26,
+              16,
+              14,
+              11,
+              9,
+              6,
+              7,
+              2,
+              3,
+              5,
+              1,
+              1,
+              0,
+              2,
+              2,
+              0,
+              1
+            ],
+            "zeroCount": 2543,
+            "zeroShare": 0.2543
+          }
+        },
+        "residual": {
+          "metrics": {
+            "mean": 3242255.1823197617,
+            "p50": 1226611.3283252874,
+            "p90": 9140311.42778319,
+            "p95": 14965509.07733051,
+            "p99": 33726453.47733488,
+            "max": 88145401.18450695,
+            "probabilityOfLoss": 0.5291,
+            "probabilityAbove50m": 0.0015,
+            "probabilityAbove100m": 0.0,
+            "exceedance": [
+              {
+                "threshold": 5000000.0,
+                "probability": 0.1782
+              },
+              {
+                "threshold": 10000000.0,
+                "probability": 0.0893
+              },
+              {
+                "threshold": 25000000.0,
+                "probability": 0.0195
+              },
+              {
+                "threshold": 50000000.0,
+                "probability": 0.0015
+              }
+            ],
+            "meanGivenLoss": 6127868.422452773,
+            "expectedEvents": 0.8105
+          },
+          "histogram": {
+            "binEdges": [
+              0.0,
+              4372877.07633754,
+              8745754.15267508,
+              13118631.22901262,
+              17491508.30535016,
+              21864385.381687697,
+              26237262.45802524,
+              30610139.534362778,
+              34983016.61070032,
+              39355893.687037855,
+              43728770.763375394,
+              48101647.83971293,
+              52474524.91605048,
+              56847401.99238802,
+              61220279.068725556,
+              65593156.145063095,
+              69966033.22140063,
+              74338910.29773818,
+              78711787.37407571,
+              83084664.45041326,
+              87457541.52675079,
+              91830418.60308833,
+              96203295.67942587,
+              100576172.75576341,
+              104949049.83210096,
+              109321926.90843849,
+              113694803.98477603,
+              118067681.06111357,
+              122440558.13745111,
+              126813435.21378864,
+              131186312.29012619
+            ],
+            "counts": [
+              3283,
+              970,
+              418,
+              241,
+              126,
+              74,
+              48,
+              41,
+              39,
+              20,
+              12,
+              7,
+              2,
+              5,
+              0,
+              2,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "zeroCount": 4709,
+            "zeroShare": 0.4709
+          }
+        },
+        "comparison": {
+          "expectedLossReduction": 4142064.1944599827,
+          "reductionPercent": 0.5609270107526567,
+          "p95Reduction": 16231479.334344456,
+          "p90Reduction": 10209932.227727884
+        },
+        "controlEconomics": {
+          "selectedControlIds": [
+            "brand-protection",
+            "app-abuse-protection"
+          ],
+          "timeBasis": "annual",
+          "costBasisNote": "Annualized: annual cost + one-time cost / 3 years + per-launch cost x 1.",
+          "estimatedCost": 1150000.0,
+          "costRange": {
+            "low": 600000.0,
+            "high": 2100000.0
+          },
+          "lossesAvoided": 4142064.1944599827,
+          "costOfInaction": 4142064.1944599827,
+          "netBenefit": 2992064.1944599827,
+          "rosi": 2.6017949517043326,
+          "p95Reduction": 16231479.334344456
+        },
+        "sensitivity": [
+          {
+            "key": "threatEventFrequency",
+            "name": "Impersonation campaigns requiring a response",
+            "correlation": 0.2553613116026233
+          },
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material player or workforce harm)",
+            "correlation": 0.25291709832236575
+          },
+          {
+            "key": "supportAccountRecovery",
+            "name": "Support and account recovery",
+            "correlation": 0.11868197509350036
+          },
+          {
+            "key": "fraudChargebacks",
+            "name": "Fraud and chargebacks absorbed",
+            "correlation": 0.10378429183078365
+          },
+          {
+            "key": "brandRegulatory",
+            "name": "Brand-trust and regulatory effects",
+            "correlation": 0.04999983265250024
+          }
+        ],
+        "tornado": [
+          {
+            "key": "conditionalSuccess",
+            "name": "Conditional success (material player or workforce harm)",
+            "lowValue": 0.05,
+            "highValue": 0.25,
+            "meanAtLow": 2626095.6397899603,
+            "meanAtHigh": 13154054.54771488,
+            "swing": 10527958.90792492
+          },
+          {
+            "key": "threatEventFrequency",
+            "name": "Impersonation campaigns requiring a response",
+            "lowValue": 4.0,
+            "highValue": 20.0,
+            "meanAtLow": 2644611.672413373,
+            "meanAtHigh": 12976038.314398883,
+            "swing": 10331426.64198551
+          },
+          {
+            "key": "brandRegulatory",
+            "name": "Brand-trust and regulatory effects",
+            "lowValue": 500000,
+            "highValue": 20000000,
+            "meanAtLow": 3649124.604808525,
+            "meanAtHigh": 13685774.604808524,
+            "swing": 10036650.0
+          },
+          {
+            "key": "secondaryProbability",
+            "name": "Probability of secondary effects",
+            "lowValue": 0.15,
+            "highValue": 0.5,
+            "meanAtLow": 5334720.1890486125,
+            "meanAtHigh": 9590449.996342948,
+            "swing": 4255729.807294335
+          },
+          {
+            "key": "supportAccountRecovery",
+            "name": "Support and account recovery",
+            "lowValue": 100000,
+            "highValue": 2500000,
+            "meanAtLow": 5821017.340490879,
+            "meanAtHigh": 9634377.340490878,
+            "swing": 3813359.999999999
+          }
+        ],
+        "readiness": {
+          "current": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "proposed": {
+            "score": 40.0,
+            "band": "Material readiness gaps"
+          },
+          "components": [
+            {
+              "id": "ddosProtection",
+              "name": "DDoS protection and traffic management",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [
+                "app-abuse-protection"
+              ],
+              "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+            },
+            {
+              "id": "loadTesting",
+              "name": "Load, stress, and resilience testing",
+              "weight": 25,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 12.5,
+              "proposedPoints": 12.5,
+              "drivers": [],
+              "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+            },
+            {
+              "id": "failoverRecovery",
+              "name": "Failover and recovery tested",
+              "weight": 20,
+              "currentLevel": 0.0,
+              "proposedLevel": 0.0,
+              "currentPoints": 0.0,
+              "proposedPoints": 0.0,
+              "drivers": [],
+              "currentRationale": "No public evidence of tested multi-region failover for launch services."
+            },
+            {
+              "id": "incidentResponse",
+              "name": "Incident response and escalation readiness",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+            },
+            {
+              "id": "monitoringComms",
+              "name": "Monitoring, player communications, and partner coordination",
+              "weight": 15,
+              "currentLevel": 0.5,
+              "proposedLevel": 0.5,
+              "currentPoints": 7.5,
+              "proposedPoints": 7.5,
+              "drivers": [],
+              "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+            }
+          ],
+          "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+        },
+        "controlBreakdown": [
+          {
+            "controlId": "brand-protection",
+            "standaloneLossReduction": 3590646.513380765,
+            "standaloneP95Reduction": 14268547.00706489,
+            "comparableCost": 350000.0,
+            "standaloneNetBenefit": 3240646.513380765,
+            "standaloneRosi": 9.258990038230758
+          },
+          {
+            "controlId": "app-abuse-protection",
+            "standaloneLossReduction": 1128793.0301136803,
+            "standaloneP95Reduction": 4284560.787034292,
+            "comparableCost": 800000.0,
+            "standaloneNetBenefit": 328793.0301136803,
+            "standaloneRosi": 0.41099128764210036
+          }
+        ]
+      }
+    }
+  },
+  "priorities": {
+    "meta": {
+      "trials": 10000,
+      "seed": 20261124,
+      "basis": "First-year view: launch-event reduction for Launch-Day DDoS plus one year of annual reductions; full first-year control cost.",
+      "weights": {
+        "expectedLossReduction": 35,
+        "reductionPerDollar": 25,
+        "p95Reduction": 20,
+        "scenarioCoverage": 10,
+        "feasibilityConfidence": 10
+      },
+      "tiers": [
+        {
+          "minimum": 60,
+          "priority": 1,
+          "label": "Priority 1 - Implement before launch"
+        },
+        {
+          "minimum": 40,
+          "priority": 2,
+          "label": "Priority 2 - Implement next"
+        },
+        {
+          "minimum": 0,
+          "priority": 3,
+          "label": "Priority 3 - Evaluate or monitor"
+        }
+      ]
+    },
+    "controls": [
+      {
+        "controlId": "managed-ddos-protection",
+        "name": "Managed DDoS protection and upstream scrubbing",
+        "shortName": "Managed DDoS protection",
+        "group": "Launch traffic protection",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 6100355.954019865,
+            "p95Reduction": 34024863.99185362,
+            "reductionShare": 0.5859236998252311,
+            "level": "high",
+            "comparableCost": 1500000.0,
+            "factors": [
+              "conditionalSuccess",
+              "outageHours",
+              "emergencyInfrastructure"
+            ],
+            "attackSteps": [
+              "infrastructure-prepared",
+              "network-flood",
+              "service-degradation"
+            ]
+          }
+        },
+        "firstYearLossReduction": 6100355.954019865,
+        "firstYearCost": 1500000.0,
+        "firstYearCostRange": {
+          "low": 800000.0,
+          "high": 3000000.0
+        },
+        "firstYearNetBenefit": 4600355.954019865,
+        "firstYearRosi": 3.0669039693465767,
+        "reductionPerDollar": 4.066903969346576,
+        "p95ReductionTotal": 34024863.99185362,
+        "scenariosHelped": 1,
+        "feasibility": 1.0,
+        "confidenceScore": 1.0,
+        "scoreBreakdown": {
+          "expectedLossReduction": 35.0,
+          "reductionPerDollar": 10.1,
+          "p95Reduction": 20.0,
+          "scenarioCoverage": 2.5,
+          "feasibilityConfidence": 10.0
+        },
+        "priorityScore": 77.6,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": false,
+        "sequence": 3
+      },
+      {
+        "controlId": "app-abuse-protection",
+        "name": "WAF, bot management, and adaptive rate limiting",
+        "shortName": "WAF, bots, rate limiting",
+        "group": "Application abuse protection",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 3863005.369238425,
+            "p95Reduction": 15486282.329553075,
+            "reductionShare": 0.3710318570668672,
+            "level": "high",
+            "comparableCost": 800000.0,
+            "factors": [
+              "conditionalSuccess",
+              "outageHours"
+            ],
+            "attackSteps": [
+              "recon",
+              "service-exhaustion"
+            ]
+          },
+          "fake-downloads": {
+            "scenarioId": "fake-downloads",
+            "timeBasis": "annual",
+            "lossReduction": 1084507.8789814971,
+            "p95Reduction": 4304988.026778895,
+            "reductionShare": 0.14686632899326793,
+            "level": "medium",
+            "comparableCost": 800000.0,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "credential-abuse"
+            ]
+          }
+        },
+        "firstYearLossReduction": 4947513.248219922,
+        "firstYearCost": 800000.0,
+        "firstYearCostRange": {
+          "low": 400000.0,
+          "high": 1500000.0
+        },
+        "firstYearNetBenefit": 4147513.248219922,
+        "firstYearRosi": 5.184391560274903,
+        "reductionPerDollar": 6.184391560274903,
+        "p95ReductionTotal": 19791270.35633197,
+        "scenariosHelped": 2,
+        "feasibility": 1.0,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 28.4,
+          "reductionPerDollar": 15.4,
+          "p95Reduction": 11.6,
+          "scenarioCoverage": 5.0,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 68.4,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": false,
+        "sequence": 4
+      },
+      {
+        "controlId": "phishing-resistant-mfa",
+        "name": "Phishing-resistant MFA (FIDO2 keys) for staff, contractors, and vendors",
+        "shortName": "Phishing-resistant MFA",
+        "group": "Identity and build protection",
+        "scenarios": {
+          "source-code-theft": {
+            "scenarioId": "source-code-theft",
+            "timeBasis": "annual",
+            "lossReduction": 2901375.192660547,
+            "p95Reduction": 18070255.65009413,
+            "reductionShare": 0.49341040216464077,
+            "level": "high",
+            "comparableCost": 266666.6666666667,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "social-engineering",
+              "valid-account"
+            ]
+          },
+          "insider-leak": {
+            "scenarioId": "insider-leak",
+            "timeBasis": "annual",
+            "lossReduction": 395310.83781405166,
+            "p95Reduction": 1541780.8543785587,
+            "reductionShare": 0.05270064228358911,
+            "level": "low",
+            "comparableCost": 266666.6666666667,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "insider-access"
+            ]
+          },
+          "fake-downloads": {
+            "scenarioId": "fake-downloads",
+            "timeBasis": "annual",
+            "lossReduction": 852360.1361466208,
+            "p95Reduction": 3669440.8980476223,
+            "reductionShare": 0.1154283953138454,
+            "level": "medium",
+            "comparableCost": 266666.6666666667,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "credential-abuse"
+            ]
+          }
+        },
+        "firstYearLossReduction": 4149046.1666212194,
+        "firstYearCost": 800000.0,
+        "firstYearCostRange": {
+          "low": 400000.0,
+          "high": 1500000.0
+        },
+        "firstYearNetBenefit": 3349046.1666212194,
+        "firstYearRosi": 4.186307708276524,
+        "reductionPerDollar": 5.186307708276524,
+        "p95ReductionTotal": 23281477.40252031,
+        "scenariosHelped": 3,
+        "feasibility": 0.6,
+        "confidenceScore": 1.0,
+        "scoreBreakdown": {
+          "expectedLossReduction": 23.8,
+          "reductionPerDollar": 12.9,
+          "p95Reduction": 13.7,
+          "scenarioCoverage": 7.5,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 65.9,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": false,
+        "sequence": 6
+      },
+      {
+        "controlId": "brand-protection",
+        "name": "Brand monitoring, fake-download takedown, and player advisories",
+        "shortName": "Brand protection and takedown",
+        "group": "Monitoring and response",
+        "scenarios": {
+          "fake-downloads": {
+            "scenarioId": "fake-downloads",
+            "timeBasis": "annual",
+            "lossReduction": 3521794.8346072086,
+            "p95Reduction": 14120007.015912585,
+            "reductionShare": 0.47692883458990387,
+            "level": "high",
+            "comparableCost": 350000.0,
+            "factors": [
+              "conditionalSuccess",
+              "supportAccountRecovery",
+              "secondaryProbability"
+            ],
+            "attackSteps": [
+              "lure-staging",
+              "malicious-file"
+            ]
+          }
+        },
+        "firstYearLossReduction": 3521794.8346072086,
+        "firstYearCost": 350000.0,
+        "firstYearCostRange": {
+          "low": 200000.0,
+          "high": 600000.0
+        },
+        "firstYearNetBenefit": 3171794.8346072086,
+        "firstYearRosi": 9.062270956020596,
+        "reductionPerDollar": 10.062270956020596,
+        "p95ReductionTotal": 14120007.015912585,
+        "scenariosHelped": 1,
+        "feasibility": 1.0,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 20.2,
+          "reductionPerDollar": 25.0,
+          "p95Reduction": 8.3,
+          "scenarioCoverage": 2.5,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 64.0,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": false,
+        "sequence": 2
+      },
+      {
+        "controlId": "vendor-access-governance",
+        "name": "Third-party access review, secure support tooling, and contractor offboarding",
+        "shortName": "Vendor access governance",
+        "group": "Vendor and collaboration controls",
+        "scenarios": {
+          "insider-leak": {
+            "scenarioId": "insider-leak",
+            "timeBasis": "annual",
+            "lossReduction": 1856864.5255778106,
+            "p95Reduction": 5510504.754103899,
+            "reductionShare": 0.24754685116321937,
+            "level": "medium",
+            "comparableCost": 500000.0,
+            "factors": [
+              "threatEventFrequency"
+            ],
+            "attackSteps": [
+              "insider-access"
+            ]
+          },
+          "source-code-theft": {
+            "scenarioId": "source-code-theft",
+            "timeBasis": "annual",
+            "lossReduction": 940206.1581015596,
+            "p95Reduction": 4136656.2129195407,
+            "reductionShare": 0.15989228134302805,
+            "level": "medium",
+            "comparableCost": 500000.0,
+            "factors": [
+              "threatEventFrequency"
+            ],
+            "attackSteps": [
+              "social-engineering"
+            ]
+          },
+          "fake-downloads": {
+            "scenarioId": "fake-downloads",
+            "timeBasis": "annual",
+            "lossReduction": 832834.8569454867,
+            "p95Reduction": 3419398.9463875927,
+            "reductionShare": 0.11278424109937141,
+            "level": "medium",
+            "comparableCost": 500000.0,
+            "factors": [
+              "threatEventFrequency"
+            ],
+            "attackSteps": [
+              "lure-staging"
+            ]
+          }
+        },
+        "firstYearLossReduction": 3629905.540624857,
+        "firstYearCost": 500000.0,
+        "firstYearCostRange": {
+          "low": 300000.0,
+          "high": 900000.0
+        },
+        "firstYearNetBenefit": 3129905.540624857,
+        "firstYearRosi": 6.259811081249714,
+        "reductionPerDollar": 7.259811081249714,
+        "p95ReductionTotal": 13066559.913411032,
+        "scenariosHelped": 3,
+        "feasibility": 0.6,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 20.8,
+          "reductionPerDollar": 18.0,
+          "p95Reduction": 7.7,
+          "scenarioCoverage": 7.5,
+          "feasibilityConfidence": 6.0
+        },
+        "priorityScore": 60.0,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": false,
+        "sequence": 5
+      },
+      {
+        "controlId": "launch-resilience-testing",
+        "name": "Load, stress, DDoS-simulation, and failover testing",
+        "shortName": "Resilience testing",
+        "group": "Validation and exercises",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 2426706.702607671,
+            "p95Reduction": 7549452.869708344,
+            "reductionShare": 0.23307901707696696,
+            "level": "medium",
+            "comparableCost": 500000.0,
+            "factors": [
+              "conditionalSuccess",
+              "outageHours"
+            ],
+            "attackSteps": [
+              "recon",
+              "service-exhaustion",
+              "service-degradation"
+            ]
+          }
+        },
+        "firstYearLossReduction": 2426706.702607671,
+        "firstYearCost": 500000.0,
+        "firstYearCostRange": {
+          "low": 250000.0,
+          "high": 1000000.0
+        },
+        "firstYearNetBenefit": 1926706.7026076708,
+        "firstYearRosi": 3.8534134052153415,
+        "reductionPerDollar": 4.853413405215342,
+        "p95ReductionTotal": 7549452.869708344,
+        "scenariosHelped": 1,
+        "feasibility": 1.0,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 13.9,
+          "reductionPerDollar": 12.1,
+          "p95Reduction": 4.4,
+          "scenarioCoverage": 2.5,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 40.9,
+        "priority": 1,
+        "priorityLabel": "Priority 1 - Implement before launch",
+        "elevated": true,
+        "elevationReason": "Elevated as a prerequisite: testing is what moves protection and failover from 'implemented' to 'implemented and tested' in the readiness index, and it validates every other launch control.",
+        "sequence": 1
+      },
+      {
+        "controlId": "build-access-pam",
+        "name": "Restricted build access, PAM, and repository hardening",
+        "shortName": "Build access and PAM",
+        "group": "Identity and build protection",
+        "scenarios": {
+          "source-code-theft": {
+            "scenarioId": "source-code-theft",
+            "timeBasis": "annual",
+            "lossReduction": 2468436.9295816286,
+            "p95Reduction": 13471544.592295524,
+            "reductionShare": 0.4197845425934265,
+            "level": "high",
+            "comparableCost": 1000000.0,
+            "factors": [
+              "conditionalSuccess",
+              "competitiveIPLoss"
+            ],
+            "attackSteps": [
+              "valid-account",
+              "collection"
+            ]
+          },
+          "insider-leak": {
+            "scenarioId": "insider-leak",
+            "timeBasis": "annual",
+            "lossReduction": 1885969.018349708,
+            "p95Reduction": 5724947.259342898,
+            "reductionShare": 0.2514269002681178,
+            "level": "medium",
+            "comparableCost": 1000000.0,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "insider-collection"
+            ]
+          }
+        },
+        "firstYearLossReduction": 4354405.947931336,
+        "firstYearCost": 1000000.0,
+        "firstYearCostRange": {
+          "low": 600000.0,
+          "high": 1800000.0
+        },
+        "firstYearNetBenefit": 3354405.9479313362,
+        "firstYearRosi": 3.3544059479313364,
+        "reductionPerDollar": 4.354405947931336,
+        "p95ReductionTotal": 19196491.85163842,
+        "scenariosHelped": 2,
+        "feasibility": 0.3,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 25.0,
+          "reductionPerDollar": 10.8,
+          "p95Reduction": 11.3,
+          "scenarioCoverage": 5.0,
+          "feasibilityConfidence": 4.5
+        },
+        "priorityScore": 56.6,
+        "priority": 2,
+        "priorityLabel": "Priority 2 - Implement next",
+        "elevated": false,
+        "sequence": 8
+      },
+      {
+        "controlId": "insider-risk-monitoring",
+        "name": "Insider-risk monitoring, DLP, and build watermarking",
+        "shortName": "Insider-risk monitoring",
+        "group": "Monitoring and response",
+        "scenarios": {
+          "insider-leak": {
+            "scenarioId": "insider-leak",
+            "timeBasis": "annual",
+            "lossReduction": 3172902.6310866345,
+            "p95Reduction": 9943547.188066062,
+            "reductionShare": 0.4229937319356025,
+            "level": "high",
+            "comparableCost": 900000.0,
+            "factors": [
+              "conditionalSuccess",
+              "secondaryProbability"
+            ],
+            "attackSteps": [
+              "insider-collection",
+              "insider-disclosure"
+            ]
+          },
+          "source-code-theft": {
+            "scenarioId": "source-code-theft",
+            "timeBasis": "annual",
+            "lossReduction": 882784.3776317183,
+            "p95Reduction": 4000113.4520313665,
+            "reductionShare": 0.1501270831479427,
+            "level": "medium",
+            "comparableCost": 900000.0,
+            "factors": [
+              "conditionalSuccess"
+            ],
+            "attackSteps": [
+              "exfiltration"
+            ]
+          }
+        },
+        "firstYearLossReduction": 4055687.0087183528,
+        "firstYearCost": 900000.0,
+        "firstYearCostRange": {
+          "low": 500000.0,
+          "high": 1600000.0
+        },
+        "firstYearNetBenefit": 3155687.0087183528,
+        "firstYearRosi": 3.5063188985759477,
+        "reductionPerDollar": 4.506318898575947,
+        "p95ReductionTotal": 13943660.640097428,
+        "scenariosHelped": 2,
+        "feasibility": 0.6,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 23.3,
+          "reductionPerDollar": 11.2,
+          "p95Reduction": 8.2,
+          "scenarioCoverage": 5.0,
+          "feasibilityConfidence": 6.0
+        },
+        "priorityScore": 53.7,
+        "priority": 2,
+        "priorityLabel": "Priority 2 - Implement next",
+        "elevated": false,
+        "sequence": 7
+      },
+      {
+        "controlId": "ir-retainer-exercises",
+        "name": "Incident response retainer and tabletop exercises",
+        "shortName": "IR retainer and exercises",
+        "group": "Monitoring and response",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 356031.43037351035,
+            "p95Reduction": 2020639.5639584064,
+            "reductionShare": 0.034195914879533114,
+            "level": "low",
+            "comparableCost": 400000.0,
+            "factors": [
+              "responseCost",
+              "outageHours"
+            ],
+            "attackSteps": [
+              "detect-respond"
+            ]
+          },
+          "source-code-theft": {
+            "scenarioId": "source-code-theft",
+            "timeBasis": "annual",
+            "lossReduction": 704412.6918383893,
+            "p95Reduction": 4151060.2803778425,
+            "reductionShare": 0.11979303829751912,
+            "level": "medium",
+            "comparableCost": 400000.0,
+            "factors": [
+              "investigationRecovery",
+              "secondaryProbability"
+            ],
+            "attackSteps": [
+              "leak-extortion"
+            ]
+          },
+          "insider-leak": {
+            "scenarioId": "insider-leak",
+            "timeBasis": "annual",
+            "lossReduction": 226687.6992734354,
+            "p95Reduction": 605297.9031563066,
+            "reductionShare": 0.03022074329041957,
+            "level": "low",
+            "comparableCost": 400000.0,
+            "factors": [
+              "investigationLegal",
+              "containmentTakedown"
+            ],
+            "attackSteps": [
+              "insider-disclosure"
+            ]
+          },
+          "fake-downloads": {
+            "scenarioId": "fake-downloads",
+            "timeBasis": "annual",
+            "lossReduction": 90448.44246171508,
+            "p95Reduction": 206952.10843558982,
+            "reductionShare": 0.01224871756578317,
+            "level": "low",
+            "comparableCost": 400000.0,
+            "factors": [
+              "takedownInvestigation"
+            ],
+            "attackSteps": [
+              "credential-abuse"
+            ]
+          }
+        },
+        "firstYearLossReduction": 1377580.26394705,
+        "firstYearCost": 400000.0,
+        "firstYearCostRange": {
+          "low": 250000.0,
+          "high": 700000.0
+        },
+        "firstYearNetBenefit": 977580.2639470501,
+        "firstYearRosi": 2.443950659867625,
+        "reductionPerDollar": 3.443950659867625,
+        "p95ReductionTotal": 6983949.855928145,
+        "scenariosHelped": 4,
+        "feasibility": 1.0,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 7.9,
+          "reductionPerDollar": 8.6,
+          "p95Reduction": 4.1,
+          "scenarioCoverage": 10.0,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 38.6,
+        "priority": 3,
+        "priorityLabel": "Priority 3 - Evaluate or monitor",
+        "elevated": false,
+        "sequence": 10
+      },
+      {
+        "controlId": "launch-war-room",
+        "name": "Traffic monitoring, launch war room, and escalation runbook",
+        "shortName": "Launch war room",
+        "group": "Monitoring and response",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 1646738.4884054512,
+            "p95Reduction": 10832250.83812359,
+            "reductionShare": 0.15816505053862112,
+            "level": "medium",
+            "comparableCost": 600000.0,
+            "factors": [
+              "outageHours",
+              "responseCost",
+              "supportSurge",
+              "secondaryProbability"
+            ],
+            "attackSteps": [
+              "infrastructure-prepared",
+              "detect-respond",
+              "business-loss"
+            ]
+          }
+        },
+        "firstYearLossReduction": 1646738.4884054512,
+        "firstYearCost": 600000.0,
+        "firstYearCostRange": {
+          "low": 300000.0,
+          "high": 1000000.0
+        },
+        "firstYearNetBenefit": 1046738.4884054512,
+        "firstYearRosi": 1.7445641473424187,
+        "reductionPerDollar": 2.7445641473424187,
+        "p95ReductionTotal": 10832250.83812359,
+        "scenariosHelped": 1,
+        "feasibility": 1.0,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 9.4,
+          "reductionPerDollar": 6.8,
+          "p95Reduction": 6.4,
+          "scenarioCoverage": 2.5,
+          "feasibilityConfidence": 8.0
+        },
+        "priorityScore": 33.1,
+        "priority": 3,
+        "priorityLabel": "Priority 3 - Evaluate or monitor",
+        "elevated": false,
+        "sequence": 9
+      },
+      {
+        "controlId": "resilient-architecture",
+        "name": "Capacity reservation, service isolation, and multi-region failover",
+        "shortName": "Resilient architecture",
+        "group": "Resilient architecture",
+        "scenarios": {
+          "launch-ddos": {
+            "scenarioId": "launch-ddos",
+            "timeBasis": "launch-event",
+            "lossReduction": 1993558.7650510445,
+            "p95Reduction": 10092287.379674375,
+            "reductionShare": 0.19147625749084654,
+            "level": "medium",
+            "comparableCost": 3000000.0,
+            "factors": [
+              "outageHours",
+              "lostRevenueFraction",
+              "refundsMakeGoods"
+            ],
+            "attackSteps": [
+              "service-degradation",
+              "business-loss"
+            ]
+          }
+        },
+        "firstYearLossReduction": 1993558.7650510445,
+        "firstYearCost": 3000000.0,
+        "firstYearCostRange": {
+          "low": 1500000.0,
+          "high": 6000000.0
+        },
+        "firstYearNetBenefit": -1006441.2349489555,
+        "firstYearRosi": -0.3354804116496518,
+        "reductionPerDollar": 0.6645195883503482,
+        "p95ReductionTotal": 10092287.379674375,
+        "scenariosHelped": 1,
+        "feasibility": 0.3,
+        "confidenceScore": 0.6,
+        "scoreBreakdown": {
+          "expectedLossReduction": 11.4,
+          "reductionPerDollar": 1.7,
+          "p95Reduction": 5.9,
+          "scenarioCoverage": 2.5,
+          "feasibilityConfidence": 4.5
+        },
+        "priorityScore": 26.0,
+        "priority": 3,
+        "priorityLabel": "Priority 3 - Evaluate or monitor",
+        "elevated": false,
+        "sequence": 11
+      }
+    ],
+    "heatmap": {
+      "scenarios": [
+        {
+          "id": "launch-ddos",
+          "name": "Launch-Day DDoS",
+          "timeBasis": "launch-event"
+        },
+        {
+          "id": "source-code-theft",
+          "name": "Build & Source Code Theft",
+          "timeBasis": "annual"
+        },
+        {
+          "id": "insider-leak",
+          "name": "Insider or Contractor Leak",
+          "timeBasis": "annual"
+        },
+        {
+          "id": "fake-downloads",
+          "name": "Fake Downloads & Phishing",
+          "timeBasis": "annual"
+        }
+      ],
+      "controls": [
+        {
+          "id": "managed-ddos-protection",
+          "name": "Managed DDoS protection and upstream scrubbing",
+          "shortName": "Managed DDoS protection"
+        },
+        {
+          "id": "app-abuse-protection",
+          "name": "WAF, bot management, and adaptive rate limiting",
+          "shortName": "WAF, bots, rate limiting"
+        },
+        {
+          "id": "phishing-resistant-mfa",
+          "name": "Phishing-resistant MFA (FIDO2 keys) for staff, contractors, and vendors",
+          "shortName": "Phishing-resistant MFA"
+        },
+        {
+          "id": "brand-protection",
+          "name": "Brand monitoring, fake-download takedown, and player advisories",
+          "shortName": "Brand protection and takedown"
+        },
+        {
+          "id": "vendor-access-governance",
+          "name": "Third-party access review, secure support tooling, and contractor offboarding",
+          "shortName": "Vendor access governance"
+        },
+        {
+          "id": "launch-resilience-testing",
+          "name": "Load, stress, DDoS-simulation, and failover testing",
+          "shortName": "Resilience testing"
+        },
+        {
+          "id": "build-access-pam",
+          "name": "Restricted build access, PAM, and repository hardening",
+          "shortName": "Build access and PAM"
+        },
+        {
+          "id": "insider-risk-monitoring",
+          "name": "Insider-risk monitoring, DLP, and build watermarking",
+          "shortName": "Insider-risk monitoring"
+        },
+        {
+          "id": "ir-retainer-exercises",
+          "name": "Incident response retainer and tabletop exercises",
+          "shortName": "IR retainer and exercises"
+        },
+        {
+          "id": "launch-war-room",
+          "name": "Traffic monitoring, launch war room, and escalation runbook",
+          "shortName": "Launch war room"
+        },
+        {
+          "id": "resilient-architecture",
+          "name": "Capacity reservation, service isolation, and multi-region failover",
+          "shortName": "Resilient architecture"
+        }
+      ],
+      "cells": [
+        {
+          "controlId": "managed-ddos-protection",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 6100355.954019865,
+          "p95Reduction": 34024863.99185362,
+          "reductionShare": 0.5859236998252311,
+          "level": "high",
+          "comparableCost": 1500000.0,
+          "factors": [
+            "conditionalSuccess",
+            "outageHours",
+            "emergencyInfrastructure"
+          ],
+          "attackSteps": [
+            "infrastructure-prepared",
+            "network-flood",
+            "service-degradation"
+          ]
+        },
+        {
+          "controlId": "managed-ddos-protection",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "managed-ddos-protection",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "managed-ddos-protection",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "app-abuse-protection",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 3863005.369238425,
+          "p95Reduction": 15486282.329553075,
+          "reductionShare": 0.3710318570668672,
+          "level": "high",
+          "comparableCost": 800000.0,
+          "factors": [
+            "conditionalSuccess",
+            "outageHours"
+          ],
+          "attackSteps": [
+            "recon",
+            "service-exhaustion"
+          ]
+        },
+        {
+          "controlId": "app-abuse-protection",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "app-abuse-protection",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "app-abuse-protection",
+          "scenarioId": "fake-downloads",
+          "timeBasis": "annual",
+          "lossReduction": 1084507.8789814971,
+          "p95Reduction": 4304988.026778895,
+          "reductionShare": 0.14686632899326793,
+          "level": "medium",
+          "comparableCost": 800000.0,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "credential-abuse"
+          ]
+        },
+        {
+          "controlId": "phishing-resistant-mfa",
+          "scenarioId": "launch-ddos",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "launch-event"
+        },
+        {
+          "controlId": "phishing-resistant-mfa",
+          "scenarioId": "source-code-theft",
+          "timeBasis": "annual",
+          "lossReduction": 2901375.192660547,
+          "p95Reduction": 18070255.65009413,
+          "reductionShare": 0.49341040216464077,
+          "level": "high",
+          "comparableCost": 266666.6666666667,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "social-engineering",
+            "valid-account"
+          ]
+        },
+        {
+          "controlId": "phishing-resistant-mfa",
+          "scenarioId": "insider-leak",
+          "timeBasis": "annual",
+          "lossReduction": 395310.83781405166,
+          "p95Reduction": 1541780.8543785587,
+          "reductionShare": 0.05270064228358911,
+          "level": "low",
+          "comparableCost": 266666.6666666667,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "insider-access"
+          ]
+        },
+        {
+          "controlId": "phishing-resistant-mfa",
+          "scenarioId": "fake-downloads",
+          "timeBasis": "annual",
+          "lossReduction": 852360.1361466208,
+          "p95Reduction": 3669440.8980476223,
+          "reductionShare": 0.1154283953138454,
+          "level": "medium",
+          "comparableCost": 266666.6666666667,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "credential-abuse"
+          ]
+        },
+        {
+          "controlId": "brand-protection",
+          "scenarioId": "launch-ddos",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "launch-event"
+        },
+        {
+          "controlId": "brand-protection",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "brand-protection",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "brand-protection",
+          "scenarioId": "fake-downloads",
+          "timeBasis": "annual",
+          "lossReduction": 3521794.8346072086,
+          "p95Reduction": 14120007.015912585,
+          "reductionShare": 0.47692883458990387,
+          "level": "high",
+          "comparableCost": 350000.0,
+          "factors": [
+            "conditionalSuccess",
+            "supportAccountRecovery",
+            "secondaryProbability"
+          ],
+          "attackSteps": [
+            "lure-staging",
+            "malicious-file"
+          ]
+        },
+        {
+          "controlId": "vendor-access-governance",
+          "scenarioId": "launch-ddos",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "launch-event"
+        },
+        {
+          "controlId": "vendor-access-governance",
+          "scenarioId": "source-code-theft",
+          "timeBasis": "annual",
+          "lossReduction": 940206.1581015596,
+          "p95Reduction": 4136656.2129195407,
+          "reductionShare": 0.15989228134302805,
+          "level": "medium",
+          "comparableCost": 500000.0,
+          "factors": [
+            "threatEventFrequency"
+          ],
+          "attackSteps": [
+            "social-engineering"
+          ]
+        },
+        {
+          "controlId": "vendor-access-governance",
+          "scenarioId": "insider-leak",
+          "timeBasis": "annual",
+          "lossReduction": 1856864.5255778106,
+          "p95Reduction": 5510504.754103899,
+          "reductionShare": 0.24754685116321937,
+          "level": "medium",
+          "comparableCost": 500000.0,
+          "factors": [
+            "threatEventFrequency"
+          ],
+          "attackSteps": [
+            "insider-access"
+          ]
+        },
+        {
+          "controlId": "vendor-access-governance",
+          "scenarioId": "fake-downloads",
+          "timeBasis": "annual",
+          "lossReduction": 832834.8569454867,
+          "p95Reduction": 3419398.9463875927,
+          "reductionShare": 0.11278424109937141,
+          "level": "medium",
+          "comparableCost": 500000.0,
+          "factors": [
+            "threatEventFrequency"
+          ],
+          "attackSteps": [
+            "lure-staging"
+          ]
+        },
+        {
+          "controlId": "launch-resilience-testing",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 2426706.702607671,
+          "p95Reduction": 7549452.869708344,
+          "reductionShare": 0.23307901707696696,
+          "level": "medium",
+          "comparableCost": 500000.0,
+          "factors": [
+            "conditionalSuccess",
+            "outageHours"
+          ],
+          "attackSteps": [
+            "recon",
+            "service-exhaustion",
+            "service-degradation"
+          ]
+        },
+        {
+          "controlId": "launch-resilience-testing",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "launch-resilience-testing",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "launch-resilience-testing",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "build-access-pam",
+          "scenarioId": "launch-ddos",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "launch-event"
+        },
+        {
+          "controlId": "build-access-pam",
+          "scenarioId": "source-code-theft",
+          "timeBasis": "annual",
+          "lossReduction": 2468436.9295816286,
+          "p95Reduction": 13471544.592295524,
+          "reductionShare": 0.4197845425934265,
+          "level": "high",
+          "comparableCost": 1000000.0,
+          "factors": [
+            "conditionalSuccess",
+            "competitiveIPLoss"
+          ],
+          "attackSteps": [
+            "valid-account",
+            "collection"
+          ]
+        },
+        {
+          "controlId": "build-access-pam",
+          "scenarioId": "insider-leak",
+          "timeBasis": "annual",
+          "lossReduction": 1885969.018349708,
+          "p95Reduction": 5724947.259342898,
+          "reductionShare": 0.2514269002681178,
+          "level": "medium",
+          "comparableCost": 1000000.0,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "insider-collection"
+          ]
+        },
+        {
+          "controlId": "build-access-pam",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "insider-risk-monitoring",
+          "scenarioId": "launch-ddos",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "launch-event"
+        },
+        {
+          "controlId": "insider-risk-monitoring",
+          "scenarioId": "source-code-theft",
+          "timeBasis": "annual",
+          "lossReduction": 882784.3776317183,
+          "p95Reduction": 4000113.4520313665,
+          "reductionShare": 0.1501270831479427,
+          "level": "medium",
+          "comparableCost": 900000.0,
+          "factors": [
+            "conditionalSuccess"
+          ],
+          "attackSteps": [
+            "exfiltration"
+          ]
+        },
+        {
+          "controlId": "insider-risk-monitoring",
+          "scenarioId": "insider-leak",
+          "timeBasis": "annual",
+          "lossReduction": 3172902.6310866345,
+          "p95Reduction": 9943547.188066062,
+          "reductionShare": 0.4229937319356025,
+          "level": "high",
+          "comparableCost": 900000.0,
+          "factors": [
+            "conditionalSuccess",
+            "secondaryProbability"
+          ],
+          "attackSteps": [
+            "insider-collection",
+            "insider-disclosure"
+          ]
+        },
+        {
+          "controlId": "insider-risk-monitoring",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "ir-retainer-exercises",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 356031.43037351035,
+          "p95Reduction": 2020639.5639584064,
+          "reductionShare": 0.034195914879533114,
+          "level": "low",
+          "comparableCost": 400000.0,
+          "factors": [
+            "responseCost",
+            "outageHours"
+          ],
+          "attackSteps": [
+            "detect-respond"
+          ]
+        },
+        {
+          "controlId": "ir-retainer-exercises",
+          "scenarioId": "source-code-theft",
+          "timeBasis": "annual",
+          "lossReduction": 704412.6918383893,
+          "p95Reduction": 4151060.2803778425,
+          "reductionShare": 0.11979303829751912,
+          "level": "medium",
+          "comparableCost": 400000.0,
+          "factors": [
+            "investigationRecovery",
+            "secondaryProbability"
+          ],
+          "attackSteps": [
+            "leak-extortion"
+          ]
+        },
+        {
+          "controlId": "ir-retainer-exercises",
+          "scenarioId": "insider-leak",
+          "timeBasis": "annual",
+          "lossReduction": 226687.6992734354,
+          "p95Reduction": 605297.9031563066,
+          "reductionShare": 0.03022074329041957,
+          "level": "low",
+          "comparableCost": 400000.0,
+          "factors": [
+            "investigationLegal",
+            "containmentTakedown"
+          ],
+          "attackSteps": [
+            "insider-disclosure"
+          ]
+        },
+        {
+          "controlId": "ir-retainer-exercises",
+          "scenarioId": "fake-downloads",
+          "timeBasis": "annual",
+          "lossReduction": 90448.44246171508,
+          "p95Reduction": 206952.10843558982,
+          "reductionShare": 0.01224871756578317,
+          "level": "low",
+          "comparableCost": 400000.0,
+          "factors": [
+            "takedownInvestigation"
+          ],
+          "attackSteps": [
+            "credential-abuse"
+          ]
+        },
+        {
+          "controlId": "launch-war-room",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 1646738.4884054512,
+          "p95Reduction": 10832250.83812359,
+          "reductionShare": 0.15816505053862112,
+          "level": "medium",
+          "comparableCost": 600000.0,
+          "factors": [
+            "outageHours",
+            "responseCost",
+            "supportSurge",
+            "secondaryProbability"
+          ],
+          "attackSteps": [
+            "infrastructure-prepared",
+            "detect-respond",
+            "business-loss"
+          ]
+        },
+        {
+          "controlId": "launch-war-room",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "launch-war-room",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "launch-war-room",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "resilient-architecture",
+          "scenarioId": "launch-ddos",
+          "timeBasis": "launch-event",
+          "lossReduction": 1993558.7650510445,
+          "p95Reduction": 10092287.379674375,
+          "reductionShare": 0.19147625749084654,
+          "level": "medium",
+          "comparableCost": 3000000.0,
+          "factors": [
+            "outageHours",
+            "lostRevenueFraction",
+            "refundsMakeGoods"
+          ],
+          "attackSteps": [
+            "service-degradation",
+            "business-loss"
+          ]
+        },
+        {
+          "controlId": "resilient-architecture",
+          "scenarioId": "source-code-theft",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "resilient-architecture",
+          "scenarioId": "insider-leak",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        },
+        {
+          "controlId": "resilient-architecture",
+          "scenarioId": "fake-downloads",
+          "level": "none",
+          "lossReduction": 0.0,
+          "reductionShare": 0.0,
+          "factors": [],
+          "attackSteps": [],
+          "timeBasis": "annual"
+        }
+      ],
+      "levels": {
+        "high": ">= 30% of scenario mean loss",
+        "medium": "10-30%",
+        "low": "< 10%",
+        "none": "Not covered"
+      }
+    }
+  },
+  "portfolioAllControls": {
+    "meta": {
+      "analysisMode": "first-year",
+      "basis": "First-year view: one GTA VI launch event plus 12 months of the three annual scenarios. Shared controls are costed once at full first-year cost.",
+      "trialsPerScenario": 10000,
+      "seed": 20261124,
+      "currency": "USD",
+      "scenarioCount": 4
+    },
+    "portfolio": {
+      "baselineMean": 31177149.066983923,
+      "residualMean": 7426269.713247177,
+      "expectedLossReduction": 23750879.353736747,
+      "reductionPercent": 0.7618040797350688
+    },
+    "controlEconomics": {
+      "selectedControlIds": [
+        "managed-ddos-protection",
+        "app-abuse-protection",
+        "resilient-architecture",
+        "launch-resilience-testing",
+        "launch-war-room",
+        "ir-retainer-exercises",
+        "phishing-resistant-mfa",
+        "build-access-pam",
+        "insider-risk-monitoring",
+        "vendor-access-governance",
+        "brand-protection"
+      ],
+      "estimatedCost": 10350000.0,
+      "costRange": {
+        "low": 5500000.0,
+        "high": 19600000.0
+      },
+      "lossesAvoided": 23750879.353736747,
+      "netBenefit": 13400879.353736747,
+      "rosi": 1.2947709520518595
+    },
+    "scenarios": [
+      {
+        "scenarioId": "launch-ddos",
+        "scenarioName": "Launch-Day DDoS",
+        "timeBasis": "launch-event",
+        "timeBasisLabel": "USD per launch event",
+        "baselineMean": 10411519.376737066,
+        "residualMean": 1467937.3192189527,
+        "lossesAvoided": 8943582.057518113,
+        "baselineP95": 70612123.60739155,
+        "residualP95": 0.0,
+        "selectedControlIds": [
+          "managed-ddos-protection",
+          "app-abuse-protection",
+          "resilient-architecture",
+          "launch-resilience-testing",
+          "launch-war-room",
+          "ir-retainer-exercises"
+        ]
+      },
+      {
+        "scenarioId": "source-code-theft",
+        "scenarioName": "Build & Source Code Theft",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 5880247.315281404,
+        "residualMean": 1160462.46700321,
+        "lossesAvoided": 4719784.848278195,
+        "baselineP95": 43793810.893208034,
+        "residualP95": 0.0,
+        "selectedControlIds": [
+          "ir-retainer-exercises",
+          "phishing-resistant-mfa",
+          "build-access-pam",
+          "insider-risk-monitoring",
+          "vendor-access-governance"
+        ]
+      },
+      {
+        "scenarioId": "insider-leak",
+        "scenarioName": "Insider or Contractor Leak",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 7501062.998185713,
+        "residualMean": 2274384.7358254977,
+        "lossesAvoided": 5226678.262360215,
+        "baselineP95": 31721879.320972256,
+        "residualP95": 15441334.873048961,
+        "selectedControlIds": [
+          "ir-retainer-exercises",
+          "phishing-resistant-mfa",
+          "build-access-pam",
+          "insider-risk-monitoring",
+          "vendor-access-governance"
+        ]
+      },
+      {
+        "scenarioId": "fake-downloads",
+        "scenarioName": "Fake Downloads & Phishing",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 7384319.376779744,
+        "residualMean": 2523485.191199517,
+        "lossesAvoided": 4860834.1855802275,
+        "baselineP95": 31196988.411674965,
+        "residualP95": 12679069.17858615,
+        "selectedControlIds": [
+          "app-abuse-protection",
+          "ir-retainer-exercises",
+          "phishing-resistant-mfa",
+          "vendor-access-governance",
+          "brand-protection"
+        ]
+      }
+    ],
+    "readiness": {
+      "current": {
+        "score": 40.0,
+        "band": "Material readiness gaps"
+      },
+      "proposed": {
+        "score": 100.0,
+        "band": "Ready"
+      },
+      "components": [
+        {
+          "id": "ddosProtection",
+          "name": "DDoS protection and traffic management",
+          "weight": 25,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 12.5,
+          "proposedPoints": 25.0,
+          "drivers": [
+            "managed-ddos-protection",
+            "app-abuse-protection"
+          ],
+          "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+        },
+        {
+          "id": "loadTesting",
+          "name": "Load, stress, and resilience testing",
+          "weight": 25,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 12.5,
+          "proposedPoints": 25.0,
+          "drivers": [
+            "launch-resilience-testing"
+          ],
+          "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+        },
+        {
+          "id": "failoverRecovery",
+          "name": "Failover and recovery tested",
+          "weight": 20,
+          "currentLevel": 0.0,
+          "proposedLevel": 1.0,
+          "currentPoints": 0.0,
+          "proposedPoints": 20.0,
+          "drivers": [
+            "resilient-architecture"
+          ],
+          "currentRationale": "No public evidence of tested multi-region failover for launch services."
+        },
+        {
+          "id": "incidentResponse",
+          "name": "Incident response and escalation readiness",
+          "weight": 15,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 7.5,
+          "proposedPoints": 15.0,
+          "drivers": [
+            "launch-war-room",
+            "ir-retainer-exercises"
+          ],
+          "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+        },
+        {
+          "id": "monitoringComms",
+          "name": "Monitoring, player communications, and partner coordination",
+          "weight": 15,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 7.5,
+          "proposedPoints": 15.0,
+          "drivers": [
+            "launch-war-room"
+          ],
+          "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+        }
+      ],
+      "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+    }
+  },
+  "portfolioPriority1": {
+    "meta": {
+      "analysisMode": "first-year",
+      "basis": "First-year view: one GTA VI launch event plus 12 months of the three annual scenarios. Shared controls are costed once at full first-year cost.",
+      "trialsPerScenario": 10000,
+      "seed": 20261124,
+      "currency": "USD",
+      "scenarioCount": 4
+    },
+    "portfolio": {
+      "baselineMean": 31177149.066983923,
+      "residualMean": 12488701.465435222,
+      "expectedLossReduction": 18688447.6015487,
+      "reductionPercent": 0.599427727063712
+    },
+    "controlEconomics": {
+      "selectedControlIds": [
+        "managed-ddos-protection",
+        "app-abuse-protection",
+        "phishing-resistant-mfa",
+        "brand-protection",
+        "vendor-access-governance",
+        "launch-resilience-testing"
+      ],
+      "estimatedCost": 4450000.0,
+      "costRange": {
+        "low": 2350000.0,
+        "high": 8500000.0
+      },
+      "lossesAvoided": 18688447.6015487,
+      "netBenefit": 14238447.601548702,
+      "rosi": 3.1996511464154387
+    },
+    "scenarios": [
+      {
+        "scenarioId": "launch-ddos",
+        "scenarioName": "Launch-Day DDoS",
+        "timeBasis": "launch-event",
+        "timeBasisLabel": "USD per launch event",
+        "baselineMean": 10411519.376737066,
+        "residualMean": 2064792.6507054511,
+        "lossesAvoided": 8346726.7260316145,
+        "baselineP95": 70612123.60739155,
+        "residualP95": 0.0,
+        "selectedControlIds": [
+          "managed-ddos-protection",
+          "app-abuse-protection",
+          "launch-resilience-testing"
+        ]
+      },
+      {
+        "scenarioId": "source-code-theft",
+        "scenarioName": "Build & Source Code Theft",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 5880247.315281404,
+        "residualMean": 2504389.3489502044,
+        "lossesAvoided": 3375857.9663311997,
+        "baselineP95": 43793810.893208034,
+        "residualP95": 14268410.929620309,
+        "selectedControlIds": [
+          "phishing-resistant-mfa",
+          "vendor-access-governance"
+        ]
+      },
+      {
+        "scenarioId": "insider-leak",
+        "scenarioName": "Insider or Contractor Leak",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 7501062.998185713,
+        "residualMean": 5359426.156262239,
+        "lossesAvoided": 2141636.8419234734,
+        "baselineP95": 31721879.320972256,
+        "residualP95": 25588454.91789403,
+        "selectedControlIds": [
+          "phishing-resistant-mfa",
+          "vendor-access-governance"
+        ]
+      },
+      {
+        "scenarioId": "fake-downloads",
+        "scenarioName": "Fake Downloads & Phishing",
+        "timeBasis": "annual",
+        "timeBasisLabel": "USD per year",
+        "baselineMean": 7384319.376779744,
+        "residualMean": 2560093.3095173277,
+        "lossesAvoided": 4824226.067262417,
+        "baselineP95": 31196988.411674965,
+        "residualP95": 12762337.145437794,
+        "selectedControlIds": [
+          "app-abuse-protection",
+          "phishing-resistant-mfa",
+          "brand-protection",
+          "vendor-access-governance"
+        ]
+      }
+    ],
+    "readiness": {
+      "current": {
+        "score": 40.0,
+        "band": "Material readiness gaps"
+      },
+      "proposed": {
+        "score": 65.0,
+        "band": "Conditional readiness"
+      },
+      "components": [
+        {
+          "id": "ddosProtection",
+          "name": "DDoS protection and traffic management",
+          "weight": 25,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 12.5,
+          "proposedPoints": 25.0,
+          "drivers": [
+            "managed-ddos-protection",
+            "app-abuse-protection"
+          ],
+          "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+        },
+        {
+          "id": "loadTesting",
+          "name": "Load, stress, and resilience testing",
+          "weight": 25,
+          "currentLevel": 0.5,
+          "proposedLevel": 1.0,
+          "currentPoints": 12.5,
+          "proposedPoints": 25.0,
+          "drivers": [
+            "launch-resilience-testing"
+          ],
+          "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+        },
+        {
+          "id": "failoverRecovery",
+          "name": "Failover and recovery tested",
+          "weight": 20,
+          "currentLevel": 0.0,
+          "proposedLevel": 0.0,
+          "currentPoints": 0.0,
+          "proposedPoints": 0.0,
+          "drivers": [],
+          "currentRationale": "No public evidence of tested multi-region failover for launch services."
+        },
+        {
+          "id": "incidentResponse",
+          "name": "Incident response and escalation readiness",
+          "weight": 15,
+          "currentLevel": 0.5,
+          "proposedLevel": 0.5,
+          "currentPoints": 7.5,
+          "proposedPoints": 7.5,
+          "drivers": [],
+          "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+        },
+        {
+          "id": "monitoringComms",
+          "name": "Monitoring, player communications, and partner coordination",
+          "weight": 15,
+          "currentLevel": 0.5,
+          "proposedLevel": 0.5,
+          "currentPoints": 7.5,
+          "proposedPoints": 7.5,
+          "drivers": [],
+          "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+        }
+      ],
+      "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+    }
+  },
+  "readinessCurrent": {
+    "current": {
+      "score": 40.0,
+      "band": "Material readiness gaps"
+    },
+    "proposed": {
+      "score": 40.0,
+      "band": "Material readiness gaps"
+    },
+    "components": [
+      {
+        "id": "ddosProtection",
+        "name": "DDoS protection and traffic management",
+        "weight": 25,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 12.5,
+        "proposedPoints": 12.5,
+        "drivers": [],
+        "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+      },
+      {
+        "id": "loadTesting",
+        "name": "Load, stress, and resilience testing",
+        "weight": 25,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 12.5,
+        "proposedPoints": 12.5,
+        "drivers": [],
+        "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+      },
+      {
+        "id": "failoverRecovery",
+        "name": "Failover and recovery tested",
+        "weight": 20,
+        "currentLevel": 0.0,
+        "proposedLevel": 0.0,
+        "currentPoints": 0.0,
+        "proposedPoints": 0.0,
+        "drivers": [],
+        "currentRationale": "No public evidence of tested multi-region failover for launch services."
+      },
+      {
+        "id": "incidentResponse",
+        "name": "Incident response and escalation readiness",
+        "weight": 15,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 7.5,
+        "proposedPoints": 7.5,
+        "drivers": [],
+        "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+      },
+      {
+        "id": "monitoringComms",
+        "name": "Monitoring, player communications, and partner coordination",
+        "weight": 15,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 7.5,
+        "proposedPoints": 7.5,
+        "drivers": [],
+        "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+      }
+    ],
+    "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+  },
+  "readinessPriority1": {
+    "current": {
+      "score": 40.0,
+      "band": "Material readiness gaps"
+    },
+    "proposed": {
+      "score": 65.0,
+      "band": "Conditional readiness"
+    },
+    "components": [
+      {
+        "id": "ddosProtection",
+        "name": "DDoS protection and traffic management",
+        "weight": 25,
+        "currentLevel": 0.5,
+        "proposedLevel": 1.0,
+        "currentPoints": 12.5,
+        "proposedPoints": 25.0,
+        "drivers": [
+          "managed-ddos-protection",
+          "app-abuse-protection"
+        ],
+        "currentRationale": "Assumes platform and cloud baseline protection is in place but not launch-tested at scale."
+      },
+      {
+        "id": "loadTesting",
+        "name": "Load, stress, and resilience testing",
+        "weight": 25,
+        "currentLevel": 0.5,
+        "proposedLevel": 1.0,
+        "currentPoints": 12.5,
+        "proposedPoints": 25.0,
+        "drivers": [
+          "launch-resilience-testing"
+        ],
+        "currentRationale": "Launch infrastructure held under record demand, which implies load testing; DDoS simulation is not evidenced."
+      },
+      {
+        "id": "failoverRecovery",
+        "name": "Failover and recovery tested",
+        "weight": 20,
+        "currentLevel": 0.0,
+        "proposedLevel": 0.0,
+        "currentPoints": 0.0,
+        "proposedPoints": 0.0,
+        "drivers": [],
+        "currentRationale": "No public evidence of tested multi-region failover for launch services."
+      },
+      {
+        "id": "incidentResponse",
+        "name": "Incident response and escalation readiness",
+        "weight": 15,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 7.5,
+        "proposedPoints": 7.5,
+        "drivers": [],
+        "currentRationale": "A security organization exists (10-K); launch-specific escalation testing is not evidenced."
+      },
+      {
+        "id": "monitoringComms",
+        "name": "Monitoring, player communications, and partner coordination",
+        "weight": 15,
+        "currentLevel": 0.5,
+        "proposedLevel": 0.5,
+        "currentPoints": 7.5,
+        "proposedPoints": 7.5,
+        "drivers": [],
+        "currentRationale": "Rockstar runs a public service-status page; joint platform-partner escalation is not evidenced."
+      }
+    ],
+    "note": "Operational evidence score, not the probability of avoiding an attack. Weights, current levels, and cutoffs are team policy assumptions."
+  }
+}

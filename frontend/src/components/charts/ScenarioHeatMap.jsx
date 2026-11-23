@@ -1,21 +1,35 @@
 import Plot from "./Plot";
 import { axisStyle, baseLayout, plotConfig } from "./chartTheme";
+import { basisSuffix, formatCurrency, formatProbability } from "../../utils/formatters";
 
 const levels = ["Very low", "Low", "Moderate", "High", "Very high"];
 const matrix = levels.map((_, impactIndex) => (
   levels.map((__, likelihoodIndex) => (impactIndex + 1) * (likelihoodIndex + 1))
 ));
+const shortNames = {
+  "launch-ddos": "Launch DDoS",
+  "source-code-theft": "Build theft",
+  "insider-leak": "Insider leak",
+  "fake-downloads": "Fake downloads",
+};
 
-const scenarioPositions = [
-  { name: "Launch DDoS", x: 4, y: 5 },
-  { name: "Source theft", x: 3, y: 4 },
-  { name: "Insider leak", x: 3, y: 4 },
-  { name: "Fake downloads", x: 4, y: 3 },
-];
+export default function ScenarioHeatMap({ overview, selectedScenarioId }) {
+  const items = overview?.scenarios || [];
+  if (!items.length) {
+    return <div className="chart-loading">Waiting for model-derived placement…</div>;
+  }
 
-export default function ScenarioHeatMap() {
+  // Nudge scenarios that share a cell so labels stay readable.
+  const seen = {};
+  const points = items.map((item) => {
+    const cell = `${item.likelihoodLevel}-${item.impactLevel}`;
+    const offset = (seen[cell] || 0) * 0.22;
+    seen[cell] = (seen[cell] || 0) + 1;
+    return { ...item, x: item.likelihoodLevel + offset, y: item.impactLevel - offset };
+  });
+
   return (
-    <div className="plot-container" role="img" aria-label="Interactive team-assessed likelihood and business-impact heat map for four cyber scenarios">
+    <div className="plot-container" role="img" aria-label="Model-derived likelihood and impact heat map for four cyber scenarios">
       <Plot
         data={[
           {
@@ -24,7 +38,7 @@ export default function ScenarioHeatMap() {
             y: [1, 2, 3, 4, 5],
             z: matrix,
             showscale: false,
-            hovertemplate: "Likelihood: %{x}<br>Impact: %{y}<br>Relative score: %{z}<extra></extra>",
+            hoverinfo: "skip",
             colorscale: [
               [0, "#183a43"],
               [0.28, "#275e65"],
@@ -38,18 +52,25 @@ export default function ScenarioHeatMap() {
           {
             type: "scatter",
             mode: "markers+text",
-            x: scenarioPositions.map((item) => item.x),
-            y: scenarioPositions.map((item) => item.y),
-            text: scenarioPositions.map((item) => item.name),
-            textposition: ["top center", "bottom left", "top right", "bottom center"],
+            x: points.map((item) => item.x),
+            y: points.map((item) => item.y),
+            text: points.map((item) => shortNames[item.scenarioId] || item.name),
+            customdata: points.map((item) => [
+              item.name,
+              formatProbability(item.metrics.probabilityOfLoss),
+              formatCurrency(item.metrics.meanGivenLoss),
+              formatCurrency(item.metrics.mean),
+              basisSuffix(item.timeBasis),
+            ]),
+            textposition: points.map((item) => (item.x >= 4.5 ? "top left" : item.x <= 1.5 ? "top right" : "top center")),
             textfont: { color: "#ffffff", size: 10 },
             marker: {
-              color: "#07101d",
-              size: 11,
+              color: points.map((item) => (item.scenarioId === selectedScenarioId ? "#35d8c1" : "#07101d")),
+              size: 12,
               line: { color: "#ffffff", width: 2 },
               symbol: "diamond",
             },
-            hovertemplate: "%{text}<br>Likelihood: %{x}/5<br>Impact: %{y}/5<extra></extra>",
+            hovertemplate: "<b>%{customdata[0]}</b><br>P(loss in period): %{customdata[1]}<br>Mean loss when it happens: %{customdata[2]}<br>Expected loss: %{customdata[3]} %{customdata[4]}<extra></extra>",
           },
         ]}
         layout={{
@@ -59,20 +80,20 @@ export default function ScenarioHeatMap() {
           margin: { l: 92, r: 22, t: 25, b: 72 },
           xaxis: {
             ...axisStyle,
-            title: { text: "Likelihood", standoff: 14 },
+            title: { text: "Likelihood (P of a loss event in the period)", standoff: 14 },
             tickmode: "array",
             tickvals: [1, 2, 3, 4, 5],
             ticktext: levels,
-            range: [0.5, 5.5],
+            range: [0.5, 5.6],
             fixedrange: true,
           },
           yaxis: {
             ...axisStyle,
-            title: { text: "Business impact", standoff: 14 },
+            title: { text: "Impact (mean loss given a loss)", standoff: 14 },
             tickmode: "array",
             tickvals: [1, 2, 3, 4, 5],
             ticktext: levels,
-            range: [0.5, 5.5],
+            range: [0.5, 5.6],
             fixedrange: true,
           },
         }}
@@ -83,4 +104,3 @@ export default function ScenarioHeatMap() {
     </div>
   );
 }
-

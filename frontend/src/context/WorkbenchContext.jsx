@@ -1,23 +1,35 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { getConfig, simulateRisk } from "../services/api";
+import { getConfig, getOverview, getPriorities, simulateRisk } from "../services/api";
 import {
   cacheConfig,
+  cacheOverview,
+  cachePriorities,
   cacheSimulation,
   readCachedConfig,
+  readCachedOverview,
+  readCachedPriorities,
   readCachedSimulation,
   simulationRequestKey,
 } from "../utils/cache";
 
 const WorkbenchContext = createContext(null);
 
+export const MODEL_SEED = 20261124;
+export const MODEL_TRIALS = 10_000;
+const DEFAULT_SCENARIO = "launch-ddos";
+const DEFAULT_CONTROLS = [
+  "managed-ddos-protection",
+  "app-abuse-protection",
+  "launch-resilience-testing",
+  "launch-war-room",
+];
+
 export function WorkbenchProvider({ children }) {
-  const [selectedScenarioId, setSelectedScenarioIdState] = useState("launch-ddos");
-  const [analysisMode, setAnalysisMode] = useState("launch-event");
-  const [selectedControlIds, setSelectedControlIds] = useState([
-    "cdn-scrubbing",
-    "rate-limiting",
-  ]);
+  const [selectedScenarioId, setSelectedScenarioIdState] = useState(DEFAULT_SCENARIO);
+  const [selectedControlIds, setSelectedControlIds] = useState(DEFAULT_CONTROLS);
   const [config, setConfig] = useState(null);
+  const [overview, setOverview] = useState(null);
+  const [priorities, setPriorities] = useState(null);
   const [results, setResults] = useState(null);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
@@ -26,6 +38,11 @@ export function WorkbenchProvider({ children }) {
   const activeRequestId = useRef(0);
   const resultsRef = useRef(null);
   const resultsKeyRef = useRef("");
+
+  const seed = config?.model?.seed || MODEL_SEED;
+  const trials = config?.model?.trials || MODEL_TRIALS;
+  const selectedScenario = config?.scenarios.find((item) => item.id === selectedScenarioId) || null;
+  const analysisMode = selectedScenario?.timeBasis || (selectedScenarioId === DEFAULT_SCENARIO ? "launch-event" : "annual");
 
   const loadConfig = useCallback(async () => {
     const cached = readCachedConfig();
@@ -42,9 +59,27 @@ export function WorkbenchProvider({ children }) {
     }
   }, []);
 
+  const loadSummaries = useCallback(async () => {
+    const cachedOverview = readCachedOverview();
+    const cachedPriorities = readCachedPriorities();
+    if (cachedOverview) setOverview((current) => current || cachedOverview.data);
+    if (cachedPriorities) setPriorities((current) => current || cachedPriorities.data);
+
+    const [overviewResult, priorityResult] = await Promise.allSettled([getOverview(), getPriorities()]);
+    if (overviewResult.status === "fulfilled") {
+      setOverview(overviewResult.value);
+      cacheOverview(overviewResult.value);
+    }
+    if (priorityResult.status === "fulfilled") {
+      setPriorities(priorityResult.value);
+      cachePriorities(priorityResult.value);
+    }
+  }, []);
+
   useEffect(() => {
     loadConfig();
-  }, [loadConfig]);
+    loadSummaries();
+  }, [loadConfig, loadSummaries]);
 
   const setSelectedScenarioId = useCallback((scenarioId) => {
     setSelectedScenarioIdState(scenarioId);
@@ -56,9 +91,8 @@ export function WorkbenchProvider({ children }) {
     const payload = {
       scenarioId: selectedScenarioId,
       controlIds: selectedControlIds,
-      analysisMode,
-      trials: 10_000,
-      seed: 243,
+      trials,
+      seed,
     };
     const requestKey = simulationRequestKey(payload);
     const requestId = activeRequestId.current + 1;
@@ -97,7 +131,7 @@ export function WorkbenchProvider({ children }) {
         setError(requestError.message);
       }
     }
-  }, [analysisMode, selectedControlIds, selectedScenarioId]);
+  }, [selectedControlIds, selectedScenarioId, seed, trials]);
 
   useEffect(() => {
     runSimulation();
@@ -117,71 +151,57 @@ export function WorkbenchProvider({ children }) {
   const resetScenario = useCallback(() => {
     const scenario = config?.scenarios.find((item) => item.id === selectedScenarioId);
     setSelectedControlIds(scenario?.recommendedControlIds || []);
-    setAnalysisMode("launch-event");
   }, [config, selectedScenarioId]);
 
   const resetDemo = useCallback(() => {
-    const launchScenario = config?.scenarios.find((item) => item.id === "launch-ddos");
-    setSelectedScenarioIdState("launch-ddos");
-    setSelectedControlIds(launchScenario?.recommendedControlIds || ["cdn-scrubbing", "rate-limiting"]);
-    setAnalysisMode("launch-event");
+    const launchScenario = config?.scenarios.find((item) => item.id === DEFAULT_SCENARIO);
+    setSelectedScenarioIdState(DEFAULT_SCENARIO);
+    setSelectedControlIds(launchScenario?.recommendedControlIds || DEFAULT_CONTROLS);
     setError("");
     setDemoResetVersion((current) => current + 1);
   }, [config]);
 
   const retryConnection = useCallback(() => {
     loadConfig();
+    loadSummaries();
     runSimulation();
-  }, [loadConfig, runSimulation]);
+  }, [loadConfig, loadSummaries, runSimulation]);
 
-  const readinessBreakdown = useMemo(() => {
-    const scenario = config?.scenarios.find((item) => item.id === selectedScenarioId);
-    const baseline = scenario?.readinessProfile || {
-      prevent: scenario?.readinessBase || 40,
-      detect: scenario?.readinessBase || 40,
-      respond: scenario?.readinessBase || 40,
-      recover: scenario?.readinessBase || 40,
-    };
-    const next = { ...baseline };
+  const readiness = results?.readiness || null;
+  const readinessScore = readiness?.proposed?.score ?? null;
 
-    selectedControlIds.forEach((controlId) => {
-      const control = config?.controls.find((item) => item.id === controlId);
-      if (!control?.readinessImpact || !control.coverage.includes(selectedScenarioId)) return;
-      Object.entries(control.readinessImpact).forEach(([dimension, points]) => {
-        next[dimension] = Math.min(100, next[dimension] + points);
-      });
-    });
-
-    return next;
-  }, [config, selectedControlIds, selectedScenarioId]);
-
-  const readinessScore = useMemo(() => {
-    const values = Object.values(readinessBreakdown);
-    return Math.round(values.reduce((total, value) => total + value, 0) / values.length);
-  }, [readinessBreakdown]);
+  const priorityById = useMemo(
+    () => Object.fromEntries((priorities?.controls || []).map((row) => [row.controlId, row])),
+    [priorities],
+  );
 
   const value = useMemo(
     () => ({
       selectedScenarioId,
       setSelectedScenarioId,
+      selectedScenario,
       analysisMode,
-      setAnalysisMode,
       selectedControlIds,
       toggleControl,
       resetScenario,
       resetDemo,
       demoResetVersion,
       config,
+      overview,
+      priorities,
+      priorityById,
       results,
       status,
       error,
       lastUpdatedAt,
       runSimulation,
       retryConnection,
+      readiness,
       readinessScore,
-      readinessBreakdown,
+      seed,
+      trials,
     }),
-    [selectedScenarioId, setSelectedScenarioId, analysisMode, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
+    [selectedScenarioId, setSelectedScenarioId, selectedScenario, analysisMode, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, overview, priorities, priorityById, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readiness, readinessScore, seed, trials],
   );
 
   return (
@@ -200,4 +220,3 @@ export function useWorkbench() {
 
   return context;
 }
-

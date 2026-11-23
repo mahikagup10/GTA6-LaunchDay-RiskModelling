@@ -1,4 +1,4 @@
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CONFIG_KEY = "cyber-workbench:config";
 const SIMULATION_PREFIX = "cyber-workbench:simulation:";
 const PORTFOLIO_PREFIX = "cyber-workbench:portfolio:";
@@ -28,7 +28,7 @@ function writeEnvelope(key, data) {
 
 export function simulationRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.scenarioId}:${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  return `${payload.scenarioId}:${payload.trials}:${payload.seed}:${controls}`;
 }
 
 export function readCachedConfig() {
@@ -49,7 +49,7 @@ export function cacheSimulation(payload, results) {
 
 function portfolioRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  return `${payload.trials}:${payload.seed}:${controls}`;
 }
 
 export function readCachedPortfolio(payload) {
@@ -58,4 +58,23 @@ export function readCachedPortfolio(payload) {
 
 export function cachePortfolio(payload, results) {
   writeEnvelope(`${PORTFOLIO_PREFIX}${portfolioRequestKey(payload)}`, results);
+}
+
+const OVERVIEW_KEY = "cyber-workbench:overview";
+const PRIORITY_KEY = "cyber-workbench:priorities";
+
+export function readCachedOverview() {
+  return readEnvelope(OVERVIEW_KEY);
+}
+
+export function cacheOverview(data) {
+  writeEnvelope(OVERVIEW_KEY, data);
+}
+
+export function readCachedPriorities() {
+  return readEnvelope(PRIORITY_KEY);
+}
+
+export function cachePriorities(data) {
+  writeEnvelope(PRIORITY_KEY, data);
 }

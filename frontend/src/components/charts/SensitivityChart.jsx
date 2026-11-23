@@ -8,10 +8,11 @@ export default function SensitivityChart({ drivers = [] }) {
 
   const ordered = [...drivers].reverse();
   const values = ordered.map((driver) => Math.abs(driver.correlation));
-  const maximum = Math.max(0.2, ...values) * 1.15;
+  const maximum = Math.max(0.1, ...values) * 1.2;
+  const height = 60 + ordered.length * 34;
 
   return (
-    <div className="plot-container" role="img" aria-label="Interactive chart of the top three baseline loss sensitivity drivers">
+    <div className="plot-container" role="img" aria-label="Chart of the top baseline loss sensitivity drivers by Spearman rank correlation">
       <Plot
         data={[
           {
@@ -19,37 +20,33 @@ export default function SensitivityChart({ drivers = [] }) {
             orientation: "h",
             y: ordered.map((driver) => driver.name),
             x: values,
-            text: values.map((value) => `${Math.round(value * 100)}%`),
+            text: values.map((value) => value.toFixed(2)),
             textposition: "outside",
             cliponaxis: false,
+            customdata: ordered.map((driver) => driver.correlation),
             marker: {
-              color: ["rgba(95, 141, 255, .62)", "rgba(95, 141, 255, .78)", "rgba(53, 216, 193, .85)"],
+              color: ordered.map((_, index) => (index === ordered.length - 1 ? "rgba(53, 216, 193, .85)" : "rgba(95, 141, 255, .7)")),
               line: { width: 0 },
             },
-            hovertemplate: "%{y}<br>Rank correlation: %{x:.3f}<extra></extra>",
+            hovertemplate: "%{y}<br>Spearman ρ: %{customdata:.3f}<extra></extra>",
           },
         ]}
         layout={{
           ...baseLayout,
-          height: 220,
+          height,
           showlegend: false,
-          margin: { l: 145, r: 42, t: 12, b: 40 },
+          margin: { l: 230, r: 42, t: 8, b: 40 },
           xaxis: {
             ...axisStyle,
-            title: { text: "Absolute rank correlation", standoff: 10 },
+            title: { text: "Absolute Spearman rank correlation with loss", standoff: 10 },
             range: [0, maximum],
-            tickformat: ".0%",
           },
-          yaxis: {
-            ...axisStyle,
-            gridcolor: "rgba(0,0,0,0)",
-          },
+          yaxis: { ...axisStyle, gridcolor: "rgba(0,0,0,0)" },
         }}
         config={{ ...plotConfig, displayModeBar: false }}
         useResizeHandler
-        style={{ width: "100%", height: "220px" }}
+        style={{ width: "100%", height: `${height}px` }}
       />
     </div>
   );
 }
-
