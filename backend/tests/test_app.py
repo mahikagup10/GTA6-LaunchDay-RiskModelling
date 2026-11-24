@@ -50,6 +50,21 @@ class AppRoutingTests(unittest.TestCase):
         for control in payload["controls"]:
             self.assertEqual(set(control["readinessImpact"]), dimensions)
 
+    def test_assets_link_to_known_scenarios_controls_and_sources(self):
+        payload = self.client.get("/api/config").get_json()
+        scenario_ids = {scenario["id"] for scenario in payload["scenarios"]}
+        control_ids = {control["id"] for control in payload["controls"]}
+        source_ids = {source["id"] for source in payload["sources"]}
+
+        self.assertGreaterEqual(len(payload["assets"]), 5)
+        for asset in payload["assets"]:
+            with self.subTest(asset=asset["id"]):
+                self.assertTrue(set(asset["scenarioIds"]).issubset(scenario_ids))
+                self.assertTrue(set(asset["controlIds"]).issubset(control_ids))
+                self.assertTrue(set(asset["sourceIds"]).issubset(source_ids))
+                self.assertTrue(asset["financialBasis"]["displayValue"])
+                self.assertIn("not", asset["financialBasis"]["explanation"].lower())
+
     def test_control_effects_expose_estimate_provenance(self):
         payload = self.client.get("/api/config").get_json()
         for control in payload["controls"]:

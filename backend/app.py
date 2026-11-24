@@ -13,7 +13,7 @@ except ImportError:
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
             return response
 
-from backend.data.config import ATTACK_CHAIN, ATTACK_CHAINS, ATTACK_PATH_DETAILS, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
+from backend.data.config import ASSETS, ATTACK_CHAIN, ATTACK_CHAINS, ATTACK_PATH_DETAILS, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
 from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_portfolio, run_simulation
 
 
@@ -34,6 +34,7 @@ def config():
     return jsonify(
         {
             "scenarios": SCENARIOS,
+            "assets": ASSETS,
             "controls": CONTROLS,
             "attackChain": ATTACK_CHAIN,
             "attackChains": ATTACK_CHAINS,

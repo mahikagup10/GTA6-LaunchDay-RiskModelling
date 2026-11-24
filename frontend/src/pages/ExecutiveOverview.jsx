@@ -1,3 +1,4 @@
+import AssetsAtRisk from "../components/AssetsAtRisk";
 import MetricCard from "../components/MetricCard";
 import PageHeader from "../components/PageHeader";
 import ScenarioHeatMap from "../components/charts/ScenarioHeatMap";
@@ -72,6 +73,14 @@ export default function ExecutiveOverview() {
           <small>Team-assessed relative placement; hover over a diamond or cell for detail.</small>
         </article>
       </section>
+
+      <AssetsAtRisk
+        assets={config?.assets || []}
+        scenarios={scenarios}
+        controls={config?.controls || []}
+        sources={config?.sources || []}
+        selectedScenarioId={selectedScenarioId}
+      />
 
       <p className="model-note"><strong>Important:</strong> readiness is a team-designed decision-support index. It is not an official FAIR or NIST score.</p>
     </div>
