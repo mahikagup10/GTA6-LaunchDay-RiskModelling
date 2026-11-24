@@ -1,9 +1,19 @@
 from pathlib import Path
 
 from flask import Flask, jsonify, request, send_from_directory
-from flask_cors import CORS
+try:
+    from flask_cors import CORS
+except ImportError:
+    def CORS(flask_app, resources=None):
+        """Small development fallback when flask-cors has not been installed yet."""
+        @flask_app.after_request
+        def add_development_cors_headers(response):
+            response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            return response
 
-from backend.data.config import ATTACK_CHAIN, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
+from backend.data.config import ATTACK_CHAIN, ATTACK_CHAINS, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
 from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_portfolio, run_simulation
 
 
@@ -26,12 +36,13 @@ def config():
             "scenarios": SCENARIOS,
             "controls": CONTROLS,
             "attackChain": ATTACK_CHAIN,
+            "attackChains": ATTACK_CHAINS,
             "sources": SOURCES,
             "methodology": METHODOLOGY,
             "model": {
                 "trials": DEFAULT_TRIALS,
                 "seed": DEFAULT_SEED,
-                "status": "launch-ddos-implemented",
+                "status": "all-four-scenarios-implemented",
             },
         }
     )
@@ -47,6 +58,8 @@ def simulate():
             mode=payload.get("analysisMode", "launch-event"),
             trials=payload.get("trials", DEFAULT_TRIALS),
             seed=payload.get("seed", DEFAULT_SEED),
+            assumptions=payload.get("assumptions"),
+            assumption_profile_id=payload.get("assumptionProfileId"),
         )
     except (TypeError, ValueError) as error:
         return jsonify({"error": str(error)}), 400
@@ -59,9 +72,10 @@ def portfolio():
     try:
         result = run_portfolio(
             control_ids=payload.get("controlIds"),
-            mode=payload.get("analysisMode", "launch-event"),
+            mode=payload.get("analysisMode"),
             trials=payload.get("trials", DEFAULT_TRIALS),
             seed=payload.get("seed", DEFAULT_SEED),
+            assumption_profile_id=payload.get("assumptionProfileId"),
         )
     except (TypeError, ValueError) as error:
         return jsonify({"error": str(error)}), 400

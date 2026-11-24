@@ -1,4 +1,10 @@
+from copy import deepcopy
+
+from backend.data.evidence_profiles import EVIDENCE_PROFILES, EVIDENCE_SOURCES
+
+
 ACCESS_DATE = "2026-11-21"
+ATTACK_PATH_ACCESS_DATE = "2026-11-24"
 
 
 ASSUMPTION_METHOD_SOURCE = {
@@ -41,6 +47,62 @@ SOURCES = [
         "type": "public-fact",
     },
     {
+        "id": "mitre-t1078",
+        "title": "MITRE ATT&CK: Valid Accounts (T1078)",
+        "url": "https://attack.mitre.org/techniques/T1078/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1083",
+        "title": "MITRE ATT&CK: File and Directory Discovery (T1083)",
+        "url": "https://attack.mitre.org/techniques/T1083/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1005",
+        "title": "MITRE ATT&CK: Data from Local System (T1005)",
+        "url": "https://attack.mitre.org/techniques/T1005/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1567",
+        "title": "MITRE ATT&CK: Exfiltration Over Web Service (T1567)",
+        "url": "https://attack.mitre.org/techniques/T1567/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1583-001",
+        "title": "MITRE ATT&CK: Acquire Infrastructure—Domains (T1583.001)",
+        "url": "https://attack.mitre.org/techniques/T1583/001/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1608-001",
+        "title": "MITRE ATT&CK: Stage Capabilities—Upload Malware (T1608.001)",
+        "url": "https://attack.mitre.org/techniques/T1608/001/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1566-002",
+        "title": "MITRE ATT&CK: Phishing—Spearphishing Link (T1566.002)",
+        "url": "https://attack.mitre.org/techniques/T1566/002/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
+        "id": "mitre-t1204-002",
+        "title": "MITRE ATT&CK: User Execution—Malicious File (T1204.002)",
+        "url": "https://attack.mitre.org/techniques/T1204/002/",
+        "accessDate": ATTACK_PATH_ACCESS_DATE,
+        "type": "public-fact",
+    },
+    {
         "id": "nist-csf-2",
         "title": "NIST Cybersecurity Framework 2.0",
         "url": "https://www.nist.gov/cyberframework",
@@ -48,13 +110,14 @@ SOURCES = [
         "type": "public-fact",
     },
 ]
+SOURCES.extend(EVIDENCE_SOURCES)
 
 
 METHODOLOGY = {
     "name": "Team FAIR-style Monte Carlo model",
     "description": "A decision-support model structured around event frequency, conditional success, and loss magnitude.",
-    "formula": "Successful loss events × (primary loss + secondary loss)",
-    "sampling": "Triangular low, most-likely, and high estimates; 10,000 trials with fixed seed 243.",
+    "formula": "Successful events × primary loss + secondary-loss events × secondary loss",
+    "sampling": "Triangular low, most-likely, and high estimates; 10,000 paired trials with fixed seed 243.",
     "controlRule": "Controls multiply frequency, vulnerability, primary loss, or secondary loss; shared controls are costed once in portfolio mode.",
     "disclaimer": "This is a team-designed FAIR-style model, not an official Open FAIR, NIST, or MITRE assessment.",
     "sourceIds": ["open-fair-methodology", "nist-csf-2"],
@@ -257,12 +320,47 @@ SCENARIOS = [
 ]
 
 
+_source_lookup = {source["id"]: source for source in SOURCES}
 for _scenario in SCENARIOS:
-    for _assumption in _scenario.get("assumptions", {}).values():
-        _assumption["source"] = {
-            **ASSUMPTION_METHOD_SOURCE,
-            "scope": "Methodology reference only; the numeric range is a team-developed estimate requiring validation.",
-        }
+    _legacy_assumptions = deepcopy(_scenario["assumptions"])
+    for _assumption in _legacy_assumptions.values():
+        _assumption["evidenceIds"] = ["open-fair-methodology"]
+
+    _evidence = deepcopy(EVIDENCE_PROFILES[_scenario["id"]])
+    _scenario["analysisBasis"] = _evidence["analysisBasis"]
+    _scenario["defaultAssumptionProfileId"] = "evidence-anchored"
+    _scenario["assumptionProfiles"] = {
+        "evidence-anchored": {
+            "id": "evidence-anchored",
+            "name": "Evidence-anchored",
+            "description": "Workbook-derived ranges tied to explicit evidence and transparent team judgments.",
+            "assumptions": _evidence["assumptions"],
+            "secondaryLossProbability": _evidence["secondaryLossProbability"],
+        },
+        "original-team": {
+            "id": "original-team",
+            "name": "Original team estimates",
+            "description": "The app's earlier broad estimates, retained for comparison rather than treated as equally authoritative.",
+            "assumptions": _legacy_assumptions,
+            "secondaryLossProbability": {
+                "value": 1.0,
+                "unit": "probability per successful event",
+                "rationale": "Legacy behavior added secondary loss after every successful event.",
+                "confidence": "low",
+                "evidenceType": "model-assumption",
+                "evidenceIds": ["open-fair-methodology"],
+            },
+        },
+    }
+    _scenario["assumptions"] = _evidence["assumptions"]
+    _scenario["secondaryLossProbability"] = _evidence["secondaryLossProbability"]
+    if "lossDerivation" in _evidence:
+        _scenario["lossDerivation"] = _evidence["lossDerivation"]
+
+    for _profile in _scenario["assumptionProfiles"].values():
+        for _assumption in list(_profile["assumptions"].values()) + [_profile["secondaryLossProbability"]]:
+            _ids = _assumption.get("evidenceIds", ["open-fair-methodology"])
+            _assumption["sources"] = [_source_lookup[source_id] for source_id in _ids if source_id in _source_lookup]
 
 
 CONTROLS = [
@@ -413,6 +511,31 @@ CONTROLS = [
 ]
 
 
+CONTROL_EFFECT_RATIONALES = {
+    "cdn-scrubbing": "Expected to reduce attack traffic reaching origin services, lower conditional disruption likelihood, and modestly reduce outage losses.",
+    "rate-limiting": "Expected to constrain abusive request patterns and protect constrained application capacity during a traffic surge.",
+    "incident-drills": "Expected to shorten escalation and recovery time, limiting direct restoration costs and downstream stakeholder effects.",
+    "repository-hardening": "Expected to make build-system compromise materially harder and reduce the scope and cost of a successful intrusion.",
+    "least-privilege": "Expected to reduce unnecessary access opportunities and limit the data or systems reachable after account misuse.",
+    "dlp-monitoring": "Expected to improve detection and containment of unusual data movement, reducing the probability and scale of material loss.",
+    "contractor-offboarding": "Expected to reduce exposure from stale contractor access and shorten the window in which former users retain privileges.",
+    "brand-monitoring": "Expected to identify impersonation campaigns sooner, support faster takedown, and reduce customer and reputation impacts.",
+    "phishing-resistant-mfa": "Expected to materially reduce credential-based compromise and limit losses from successful impersonation campaigns.",
+}
+
+_control_method_source = next(source for source in SOURCES if source["id"] == "nist-csf-2")
+for _control in CONTROLS:
+    _control["effectEvidence"] = {
+        "evidenceType": "team-estimate",
+        "rationale": CONTROL_EFFECT_RATIONALES[_control["id"]],
+        "confidence": _control["confidence"],
+        "source": {
+            **_control_method_source,
+            "scope": "Control-framework reference only; the quantitative multipliers are team-developed estimates for this decision model and require organizational validation.",
+        },
+    }
+
+
 ATTACK_CHAIN = [
     {
         "id": "reconnaissance",
@@ -483,6 +606,163 @@ ATTACK_CHAIN = [
         "sourceIds": ["mitre-t1499"],
     },
 ]
+
+
+# DDoS remains the deeply researched showcase. The other paths are concise,
+# decision-oriented narratives that reuse the same interaction pattern.
+ATTACK_CHAINS = {
+    "launch-ddos": ATTACK_CHAIN,
+    "source-code-theft": [
+        {
+            "id": "source-valid-access", "number": "01", "title": "Obtain development access",
+            "technique": "T1078 — Valid Accounts", "stride": "Spoofing / Elevation of Privilege",
+            "attackerAction": "Use stolen, reused, or insufficiently revoked credentials to enter a repository, developer platform, VPN, or build service.",
+            "defenderSignal": "Login from an unusual device or location, impossible travel, dormant-account use, or abnormal authentication failures followed by success.",
+            "businessEffect": "The attacker gains trusted access to proprietary development systems without immediately deploying obvious malware.",
+            "decisionQuestion": "Can the team prevent or quickly challenge abnormal use of a valid developer account?",
+            "evidenceType": "public-fact", "confidence": "high",
+            "controlIds": ["phishing-resistant-mfa", "least-privilege", "repository-hardening"],
+            "controlIntervention": "Phishing-resistant MFA blocks many credential-only attacks; least privilege and repository hardening restrict what a compromised identity can reach.",
+            "sourceIds": ["mitre-t1078"],
+        },
+        {
+            "id": "source-discovery", "number": "02", "title": "Discover repositories and builds",
+            "technique": "T1083 — File and Directory Discovery", "stride": "Information Disclosure",
+            "attackerAction": "Search accessible repositories, shared drives, build outputs, secrets, and project directories to identify high-value source and release assets.",
+            "defenderSignal": "Unusual repository enumeration, broad search activity, access to projects outside the user's role, or rapid metadata queries.",
+            "businessEffect": "The attacker identifies the code, credentials, and build artefacts with the greatest competitive or launch value.",
+            "decisionQuestion": "Would current access boundaries stop one compromised account from discovering multiple critical projects?",
+            "evidenceType": "public-fact", "confidence": "medium",
+            "controlIds": ["least-privilege", "repository-hardening", "dlp-monitoring"],
+            "controlIntervention": "Role-based repository access limits discovery scope, while behavior monitoring flags enumeration inconsistent with the account's normal work.",
+            "sourceIds": ["mitre-t1083"],
+        },
+        {
+            "id": "source-collection", "number": "03", "title": "Collect source and secrets",
+            "technique": "T1005 — Data from Local System", "stride": "Information Disclosure",
+            "attackerAction": "Clone repositories or collect source code, build configurations, signing material, development secrets, and unreleased assets.",
+            "defenderSignal": "Large or unusual clones, archive creation, bulk downloads, secret-file access, or activity outside normal working patterns.",
+            "businessEffect": "Sensitive intellectual property is assembled into a form that can be removed, leaked, or used to compromise builds.",
+            "decisionQuestion": "Can monitoring distinguish a legitimate build workflow from unusual bulk collection?",
+            "evidenceType": "public-fact", "confidence": "medium",
+            "controlIds": ["repository-hardening", "dlp-monitoring"],
+            "controlIntervention": "Repository protections constrain bulk operations and secret exposure; DLP and behavior analytics identify unusual collection volume.",
+            "sourceIds": ["mitre-t1005"],
+        },
+        {
+            "id": "source-exfiltration", "number": "04", "title": "Exfiltrate and exploit",
+            "technique": "T1567 — Exfiltration Over Web Service", "stride": "Information Disclosure / Repudiation",
+            "attackerAction": "Transfer collected assets to external cloud, code-hosting, or file-sharing services and potentially publish or monetize them.",
+            "defenderSignal": "High outbound data volume, uploads to personal services, newly created archives, unusual tokens, or public appearance of internal material.",
+            "businessEffect": "The organization faces investigation and rebuild costs, competitive exposure, partner concerns, and possible launch delay.",
+            "decisionQuestion": "Can the team block the transfer and revoke access before the material leaves organizational control?",
+            "evidenceType": "team-estimate", "confidence": "medium",
+            "controlIds": ["dlp-monitoring", "incident-drills", "repository-hardening"],
+            "controlIntervention": "DLP can detect or block unusual transfers; rehearsed response accelerates token revocation, containment, evidence preservation, and stakeholder decisions.",
+            "sourceIds": ["mitre-t1567"],
+        },
+    ],
+    "insider-leak": [
+        {
+            "id": "insider-authorized-access", "number": "01", "title": "Use trusted access",
+            "technique": "T1078 — Valid Accounts", "stride": "Elevation of Privilege / Repudiation",
+            "attackerAction": "An employee, contractor, or former worker uses legitimate or insufficiently revoked access to reach confidential systems.",
+            "defenderSignal": "Dormant-account use, access after role change, unusual working hours, policy exceptions, or repeated access to material unrelated to assigned duties.",
+            "businessEffect": "Trusted access allows the actor to blend malicious or careless activity with legitimate business work.",
+            "decisionQuestion": "Are access changes and contractor departures reflected in systems quickly enough?",
+            "evidenceType": "public-fact", "confidence": "high",
+            "controlIds": ["contractor-offboarding", "least-privilege"],
+            "controlIntervention": "Automated offboarding closes stale accounts, while least-privilege reviews align current access with current job responsibilities.",
+            "sourceIds": ["mitre-t1078"],
+        },
+        {
+            "id": "insider-discovery", "number": "02", "title": "Locate sensitive material",
+            "technique": "T1083 — File and Directory Discovery", "stride": "Information Disclosure",
+            "attackerAction": "Search project folders, collaboration platforms, repositories, or customer records for valuable unreleased or regulated information.",
+            "defenderSignal": "Broad search queries, access across unrelated projects, repeated denied requests, or sudden interest in high-sensitivity folders.",
+            "businessEffect": "The actor identifies which files could cause the greatest launch, privacy, legal, or reputational harm.",
+            "decisionQuestion": "Do data classifications and access boundaries make abnormal discovery visible?",
+            "evidenceType": "public-fact", "confidence": "medium",
+            "controlIds": ["least-privilege", "dlp-monitoring"],
+            "controlIntervention": "Least privilege reduces reachable material; DLP and behavioral monitoring identify access inconsistent with a person's normal role.",
+            "sourceIds": ["mitre-t1083"],
+        },
+        {
+            "id": "insider-collection", "number": "03", "title": "Collect or copy data",
+            "technique": "T1005 — Data from Local System", "stride": "Information Disclosure / Repudiation",
+            "attackerAction": "Copy, export, screenshot, archive, or otherwise collect confidential material using legitimate applications or local tools.",
+            "defenderSignal": "Bulk downloads, unusual printing, removable-media activity, archive creation, or sudden changes in normal data-transfer volume.",
+            "businessEffect": "Confidential information moves from controlled systems into a portable form that is easier to leak or misuse.",
+            "decisionQuestion": "Can the team intervene before collection becomes an external disclosure?",
+            "evidenceType": "public-fact", "confidence": "medium",
+            "controlIds": ["dlp-monitoring", "least-privilege"],
+            "controlIntervention": "DLP policies and behavior analytics detect sensitive exports and unusual volume; permissions limit the amount available to collect.",
+            "sourceIds": ["mitre-t1005"],
+        },
+        {
+            "id": "insider-disclosure", "number": "04", "title": "Disclose externally",
+            "technique": "T1567 — Exfiltration Over Web Service", "stride": "Information Disclosure / Repudiation",
+            "attackerAction": "Upload the material to personal cloud storage, messaging, social media, press contacts, or public file-sharing services.",
+            "defenderSignal": "Uploads to unsanctioned services, outbound sharing links, unusual forwarding, or confidential material appearing outside the organization.",
+            "businessEffect": "The disclosure can trigger containment, legal, notification, partner, customer-trust, and competitive consequences.",
+            "decisionQuestion": "Can the organization contain access and coordinate legal, communications, and technical response quickly?",
+            "evidenceType": "team-estimate", "confidence": "medium",
+            "controlIds": ["dlp-monitoring", "incident-drills", "contractor-offboarding"],
+            "controlIntervention": "DLP can block common transfer routes; offboarding and practiced incident response shorten the period of continued access and external harm.",
+            "sourceIds": ["mitre-t1567"],
+        },
+    ],
+    "fake-downloads": [
+        {
+            "id": "fake-domain", "number": "01", "title": "Create lookalike infrastructure",
+            "technique": "T1583.001 — Acquire Infrastructure: Domains", "stride": "Spoofing",
+            "attackerAction": "Register lookalike domains and create websites or accounts that imitate the official product, company, support team, or download experience.",
+            "defenderSignal": "New typo-squatted domains, copied branding, suspicious certificates, impersonating social accounts, or paid advertisements using launch terms.",
+            "businessEffect": "Customers may mistake attacker-controlled infrastructure for an official source because it visually resembles the real brand.",
+            "decisionQuestion": "How quickly can the team discover and begin takedown of impersonating infrastructure?",
+            "evidenceType": "public-fact", "confidence": "high",
+            "controlIds": ["brand-monitoring", "incident-drills"],
+            "controlIntervention": "Brand monitoring detects lookalike domains and accounts; rehearsed escalation speeds registrar, platform, legal, and communications action.",
+            "sourceIds": ["mitre-t1583-001"],
+        },
+        {
+            "id": "fake-payload", "number": "02", "title": "Stage the fake download",
+            "technique": "T1608.001 — Stage Capabilities: Upload Malware", "stride": "Tampering",
+            "attackerAction": "Upload a malicious installer, credential-harvesting page, or altered file and present it as an early build, launcher, patch, or promotion.",
+            "defenderSignal": "Files using company names, copied download pages, malicious hashes, unexpected signing information, or newly hosted payloads.",
+            "businessEffect": "A believable malicious asset is prepared to steal credentials, infect devices, or exploit customer interest in the launch.",
+            "decisionQuestion": "Can official channels make authentic downloads and signing information easy to verify?",
+            "evidenceType": "public-fact", "confidence": "medium",
+            "controlIds": ["brand-monitoring", "phishing-resistant-mfa"],
+            "controlIntervention": "Monitoring supports payload and hosting takedown; phishing-resistant MFA limits the usefulness of credentials captured from workforce users.",
+            "sourceIds": ["mitre-t1608-001"],
+        },
+        {
+            "id": "fake-delivery", "number": "03", "title": "Distribute deceptive links",
+            "technique": "T1566.002 — Phishing: Spearphishing Link", "stride": "Spoofing / Tampering",
+            "attackerAction": "Spread links through email, social media, advertisements, search results, communities, or direct messages using launch-related urgency.",
+            "defenderSignal": "Reported messages, repeated shortened links, sudden traffic to lookalike domains, or campaigns copying official announcements.",
+            "businessEffect": "The campaign reaches customers, partners, or employees and borrows trust from the legitimate launch and brand.",
+            "decisionQuestion": "Can warnings and takedowns reach likely victims before the campaign scales?",
+            "evidenceType": "public-fact", "confidence": "high",
+            "controlIds": ["brand-monitoring", "incident-drills", "phishing-resistant-mfa"],
+            "controlIntervention": "Monitoring accelerates discovery and takedown; MFA protects workforce accounts, while drills coordinate warnings, support, and platform escalation.",
+            "sourceIds": ["mitre-t1566-002"],
+        },
+        {
+            "id": "fake-execution", "number": "04", "title": "Victim executes or signs in",
+            "technique": "T1204.002 — User Execution: Malicious File", "stride": "Tampering / Information Disclosure",
+            "attackerAction": "A victim downloads and runs the file or enters credentials into the fraudulent service, enabling malware, theft, fraud, or follow-on compromise.",
+            "defenderSignal": "Customer reports, endpoint alerts, credential abuse, support spikes, malicious-file telemetry, or compromised accounts promoting the campaign.",
+            "businessEffect": "Victims can suffer device compromise or account theft, while the organization incurs response, support, fraud, and reputation costs.",
+            "decisionQuestion": "Can the team contain compromised accounts, support victims, and clearly direct users to official channels?",
+            "evidenceType": "team-estimate", "confidence": "medium",
+            "controlIds": ["phishing-resistant-mfa", "brand-monitoring", "incident-drills"],
+            "controlIntervention": "MFA reduces credential replay against protected accounts; monitoring and response procedures support takedown, victim guidance, and containment.",
+            "sourceIds": ["mitre-t1204-002"],
+        },
+    ],
+}
 
 
 def get_scenario(scenario_id):

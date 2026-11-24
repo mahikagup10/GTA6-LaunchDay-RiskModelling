@@ -1,4 +1,4 @@
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CONFIG_KEY = "cyber-workbench:config";
 const SIMULATION_PREFIX = "cyber-workbench:simulation:";
 const PORTFOLIO_PREFIX = "cyber-workbench:portfolio:";
@@ -28,7 +28,13 @@ function writeEnvelope(key, data) {
 
 export function simulationRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.scenarioId}:${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  const assumptions = payload.assumptions
+    ? Object.entries(payload.assumptions)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, estimate]) => typeof estimate === "number" ? `${key}=${estimate}` : `${key}=${estimate.low},${estimate.mode},${estimate.high}`)
+      .join(";")
+    : "configured";
+  return `${payload.scenarioId}:${payload.analysisMode}:${payload.assumptionProfileId || "default"}:${payload.trials}:${payload.seed}:${controls}:${assumptions}`;
 }
 
 export function readCachedConfig() {
@@ -49,7 +55,7 @@ export function cacheSimulation(payload, results) {
 
 function portfolioRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  return `${payload.analysisMode || "mixed"}:${payload.assumptionProfileId || "default"}:${payload.trials}:${payload.seed}:${controls}`;
 }
 
 export function readCachedPortfolio(payload) {

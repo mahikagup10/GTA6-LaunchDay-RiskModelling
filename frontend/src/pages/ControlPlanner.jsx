@@ -7,7 +7,7 @@ import { cachePortfolio, readCachedPortfolio } from "../utils/cache";
 import { formatCurrency } from "../utils/formatters";
 
 export default function ControlPlanner() {
-  const { config, results, status, analysisMode, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
+  const { config, results, status, assumptionProfileId, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
   const [plannerMode, setPlannerMode] = useState("scenario");
   const [portfolioControlIds, setPortfolioControlIds] = useState(null);
   const [portfolioResults, setPortfolioResults] = useState(null);
@@ -47,7 +47,7 @@ export default function ControlPlanner() {
 
     const payload = {
       controlIds: portfolioControlIds,
-      analysisMode,
+      assumptionProfileId,
       trials: 10_000,
       seed: 243,
     };
@@ -76,7 +76,7 @@ export default function ControlPlanner() {
       });
 
     return () => { cancelled = true; };
-  }, [analysisMode, plannerMode, portfolioControlIds]);
+  }, [assumptionProfileId, plannerMode, portfolioControlIds]);
 
   const recommendedControls = controls.filter((control) => recommendedIds.includes(control.id));
   const additionalControls = controls.filter((control) => (
@@ -139,6 +139,13 @@ export default function ControlPlanner() {
           </div>
           <p>{applicable ? effectSummary(control) : `Switch to ${control.coverage.map((id) => scenarioNames[id] || id).join(" or ")} to enable`}</p>
           {control.coverage && <small>Coverage: {control.coverage.map((id) => scenarioNames[id] || id).join(", ")}</small>}
+          {control.effectEvidence && <details className="control-evidence">
+            <summary>Why these effect estimates?</summary>
+            <p>{control.effectEvidence.rationale}</p>
+            <div><span className="evidence-badge team-estimate">Team estimate</span><strong>Confidence: {control.effectEvidence.confidence}</strong></div>
+            <a href={control.effectEvidence.source.url} target="_blank" rel="noreferrer">{control.effectEvidence.source.title}</a>
+            <small>Accessed {control.effectEvidence.source.accessDate}. {control.effectEvidence.source.scope}</small>
+          </details>}
         </div>
         <div><span>Estimated cost</span><strong>{formatCurrency(control.cost.mode ?? control.cost)}</strong><small>{control.cost.low != null && `${formatCurrency(control.cost.low)}–${formatCurrency(control.cost.high)}`}</small></div>
         <div><span>Implementation</span><strong>{implementation ? `${implementation.mode} weeks` : "—"}</strong><small>{implementation && `${implementation.low}–${implementation.high} week range`}</small></div>
@@ -206,15 +213,16 @@ export default function ControlPlanner() {
       {plannerMode === "portfolio" && portfolioResults && (
         <section className="portfolio-breakdown panel">
           <div className="control-section-heading">
-            <div><h2>Scenario-by-scenario impact</h2><p>Combined exposure is the sum of the four modelled scenario means.</p></div>
+            <div><h2>Scenario-by-scenario impact</h2><p>A true portfolio distribution combines each trial: launch-event DDoS plus annual estimates for the other scenarios.</p></div>
             <span>{portfolioResults.meta.trialsPerScenario.toLocaleString()} trials each</span>
           </div>
           <div className="portfolio-table-wrap">
             <table className="portfolio-table">
-              <thead><tr><th>Scenario</th><th>Baseline</th><th>Residual</th><th>Loss avoided</th><th>Controls</th></tr></thead>
+              <thead><tr><th>Scenario</th><th>Basis</th><th>Baseline</th><th>Residual</th><th>Loss avoided</th><th>Controls</th></tr></thead>
               <tbody>{portfolioResults.scenarios.map((scenario) => (
                 <tr key={scenario.scenarioId}>
                   <td>{scenario.scenarioName}</td>
+                  <td>{scenario.analysisBasis === "launch-event" ? "Launch event" : "Annual"}</td>
                   <td>{formatCurrency(scenario.baselineMean)}</td>
                   <td>{formatCurrency(scenario.residualMean)}</td>
                   <td>{formatCurrency(scenario.lossesAvoided)}</td>

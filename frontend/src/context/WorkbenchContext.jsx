@@ -13,6 +13,7 @@ const WorkbenchContext = createContext(null);
 export function WorkbenchProvider({ children }) {
   const [selectedScenarioId, setSelectedScenarioIdState] = useState("launch-ddos");
   const [analysisMode, setAnalysisMode] = useState("launch-event");
+  const [assumptionProfileId, setAssumptionProfileIdState] = useState("evidence-anchored");
   const [selectedControlIds, setSelectedControlIds] = useState([
     "cdn-scrubbing",
     "rate-limiting",
@@ -23,6 +24,7 @@ export function WorkbenchProvider({ children }) {
   const [error, setError] = useState("");
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
   const [demoResetVersion, setDemoResetVersion] = useState(0);
+  const [appliedAssumptions, setAppliedAssumptions] = useState({});
   const activeRequestId = useRef(0);
   const resultsRef = useRef(null);
   const resultsKeyRef = useRef("");
@@ -50,7 +52,18 @@ export function WorkbenchProvider({ children }) {
     setSelectedScenarioIdState(scenarioId);
     const scenario = config?.scenarios.find((item) => item.id === scenarioId);
     setSelectedControlIds(scenario?.recommendedControlIds || []);
+    setAnalysisMode(scenario?.analysisBasis || "annual");
+    setAssumptionProfileIdState(scenario?.defaultAssumptionProfileId || "evidence-anchored");
   }, [config]);
+
+  const setAssumptionProfileId = useCallback((profileId) => {
+    setAssumptionProfileIdState(profileId);
+    setAppliedAssumptions((current) => {
+      const next = { ...current };
+      delete next[selectedScenarioId];
+      return next;
+    });
+  }, [selectedScenarioId]);
 
   const runSimulation = useCallback(async () => {
     const payload = {
@@ -59,6 +72,8 @@ export function WorkbenchProvider({ children }) {
       analysisMode,
       trials: 10_000,
       seed: 243,
+      assumptionProfileId,
+      assumptions: appliedAssumptions[selectedScenarioId] || undefined,
     };
     const requestKey = simulationRequestKey(payload);
     const requestId = activeRequestId.current + 1;
@@ -97,7 +112,7 @@ export function WorkbenchProvider({ children }) {
         setError(requestError.message);
       }
     }
-  }, [analysisMode, selectedControlIds, selectedScenarioId]);
+  }, [analysisMode, appliedAssumptions, assumptionProfileId, selectedControlIds, selectedScenarioId]);
 
   useEffect(() => {
     runSimulation();
@@ -117,7 +132,8 @@ export function WorkbenchProvider({ children }) {
   const resetScenario = useCallback(() => {
     const scenario = config?.scenarios.find((item) => item.id === selectedScenarioId);
     setSelectedControlIds(scenario?.recommendedControlIds || []);
-    setAnalysisMode("launch-event");
+    setAnalysisMode(scenario?.analysisBasis || "annual");
+    setAssumptionProfileIdState(scenario?.defaultAssumptionProfileId || "evidence-anchored");
   }, [config, selectedScenarioId]);
 
   const resetDemo = useCallback(() => {
@@ -125,9 +141,26 @@ export function WorkbenchProvider({ children }) {
     setSelectedScenarioIdState("launch-ddos");
     setSelectedControlIds(launchScenario?.recommendedControlIds || ["cdn-scrubbing", "rate-limiting"]);
     setAnalysisMode("launch-event");
+    setAssumptionProfileIdState("evidence-anchored");
+    setAppliedAssumptions({});
     setError("");
     setDemoResetVersion((current) => current + 1);
   }, [config]);
+
+  const applyScenarioAssumptions = useCallback((assumptions) => {
+    setAppliedAssumptions((current) => ({
+      ...current,
+      [selectedScenarioId]: assumptions,
+    }));
+  }, [selectedScenarioId]);
+
+  const resetScenarioAssumptions = useCallback(() => {
+    setAppliedAssumptions((current) => {
+      const next = { ...current };
+      delete next[selectedScenarioId];
+      return next;
+    });
+  }, [selectedScenarioId]);
 
   const retryConnection = useCallback(() => {
     loadConfig();
@@ -166,11 +199,16 @@ export function WorkbenchProvider({ children }) {
       setSelectedScenarioId,
       analysisMode,
       setAnalysisMode,
+      assumptionProfileId,
+      setAssumptionProfileId,
       selectedControlIds,
       toggleControl,
       resetScenario,
       resetDemo,
       demoResetVersion,
+      currentAppliedAssumptions: appliedAssumptions[selectedScenarioId] || null,
+      applyScenarioAssumptions,
+      resetScenarioAssumptions,
       config,
       results,
       status,
@@ -181,7 +219,7 @@ export function WorkbenchProvider({ children }) {
       readinessScore,
       readinessBreakdown,
     }),
-    [selectedScenarioId, setSelectedScenarioId, analysisMode, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
+    [selectedScenarioId, setSelectedScenarioId, analysisMode, assumptionProfileId, setAssumptionProfileId, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, appliedAssumptions, applyScenarioAssumptions, resetScenarioAssumptions, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
   );
 
   return (

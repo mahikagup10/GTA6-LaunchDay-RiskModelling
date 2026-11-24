@@ -32,11 +32,15 @@ class AppRoutingTests(unittest.TestCase):
         payload = self.client.get("/api/config").get_json()
         self.assertIn("methodology", payload)
         for scenario in payload["scenarios"]:
-            for assumption in scenario["assumptions"].values():
-                self.assertTrue(assumption["source"]["url"].startswith("https://"))
-                self.assertTrue(assumption["source"]["accessDate"])
-                self.assertTrue(assumption["rationale"])
-                self.assertTrue(assumption["confidence"])
+            self.assertEqual(scenario["defaultAssumptionProfileId"], "evidence-anchored")
+            self.assertIn("original-team", scenario["assumptionProfiles"])
+            for profile in scenario["assumptionProfiles"].values():
+                self.assertIn("secondaryLossProbability", profile)
+                for assumption in profile["assumptions"].values():
+                    self.assertTrue(assumption["sources"])
+                    self.assertTrue(assumption["sources"][0]["url"].startswith("https://"))
+                    self.assertTrue(assumption["rationale"])
+                    self.assertTrue(assumption["confidence"])
 
     def test_readiness_inputs_cover_all_four_dimensions(self):
         payload = self.client.get("/api/config").get_json()
@@ -45,6 +49,34 @@ class AppRoutingTests(unittest.TestCase):
             self.assertEqual(set(scenario["readinessProfile"]), dimensions)
         for control in payload["controls"]:
             self.assertEqual(set(control["readinessImpact"]), dimensions)
+
+    def test_control_effects_expose_estimate_provenance(self):
+        payload = self.client.get("/api/config").get_json()
+        for control in payload["controls"]:
+            evidence = control["effectEvidence"]
+            self.assertEqual(evidence["evidenceType"], "team-estimate")
+            self.assertTrue(evidence["rationale"])
+            self.assertTrue(evidence["confidence"])
+            self.assertTrue(evidence["source"]["url"].startswith("https://"))
+            self.assertTrue(evidence["source"]["accessDate"])
+            self.assertIn("team-developed", evidence["source"]["scope"])
+
+    def test_every_scenario_has_a_complete_attack_path(self):
+        payload = self.client.get("/api/config").get_json()
+        scenario_ids = {scenario["id"] for scenario in payload["scenarios"]}
+        control_ids = {control["id"] for control in payload["controls"]}
+        source_ids = {source["id"] for source in payload["sources"]}
+
+        self.assertEqual(set(payload["attackChains"]), scenario_ids)
+        for scenario_id, stages in payload["attackChains"].items():
+            with self.subTest(scenario_id=scenario_id):
+                self.assertEqual(len(stages), 4)
+                self.assertEqual([stage["number"] for stage in stages], ["01", "02", "03", "04"])
+                for stage in stages:
+                    self.assertTrue(set(stage["controlIds"]).issubset(control_ids))
+                    self.assertTrue(set(stage["sourceIds"]).issubset(source_ids))
+                    self.assertTrue(stage["attackerAction"])
+                    self.assertTrue(stage["businessEffect"])
 
 
 if __name__ == "__main__":

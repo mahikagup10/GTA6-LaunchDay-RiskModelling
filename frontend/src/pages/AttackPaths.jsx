@@ -4,11 +4,14 @@ import { attackStages as fallbackStages, scenarios as fallbackScenarios } from "
 import { useWorkbench } from "../context/WorkbenchContext";
 
 export default function AttackPaths() {
+  const [selectedPathId, setSelectedPathId] = useState("launch-ddos");
   const [activeStage, setActiveStage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const { config, demoResetVersion } = useWorkbench();
   const scenarios = config?.scenarios || fallbackScenarios;
-  const attackStages = config?.attackChain || fallbackStages;
+  const attackChains = config?.attackChains || { "launch-ddos": config?.attackChain || fallbackStages };
+  const attackStages = attackChains[selectedPathId] || attackChains["launch-ddos"] || fallbackStages;
+  const selectedScenario = scenarios.find((scenario) => scenario.id === selectedPathId) || scenarios[0];
   const stage = attackStages[activeStage];
   const controlsById = useMemo(
     () => Object.fromEntries((config?.controls || []).map((control) => [control.id, control])),
@@ -38,6 +41,12 @@ export default function AttackPaths() {
   useEffect(() => {
     setActiveStage(0);
     setIsPlaying(false);
+  }, [selectedPathId]);
+
+  useEffect(() => {
+    setSelectedPathId("launch-ddos");
+    setActiveStage(0);
+    setIsPlaying(false);
   }, [demoResetVersion]);
 
   function selectStage(index) {
@@ -63,17 +72,24 @@ export default function AttackPaths() {
 
       <section className="scenario-list">
         {scenarios.map((scenario) => (
-          <article key={scenario.id} className={scenario.id === "launch-ddos" ? "scenario-card featured" : "scenario-card"}>
+          <button
+            type="button"
+            key={scenario.id}
+            className={`scenario-card scenario-selector${scenario.id === selectedPathId ? " selected" : ""}${scenario.id === "launch-ddos" ? " featured" : ""}`}
+            onClick={() => setSelectedPathId(scenario.id)}
+            aria-pressed={scenario.id === selectedPathId}
+          >
             <span>{scenario.severity}</span>
             <h3>{scenario.name}</h3>
             <p>{scenario.summary}</p>
-          </article>
+            <small>{scenario.id === "launch-ddos" ? "Detailed showcase" : "Concise 4-stage path"}</small>
+          </button>
         ))}
       </section>
 
       <section className="panel attack-panel">
         <div className="section-heading">
-          <div><span className="eyebrow">Detailed pathway</span><h2>Launch-Day DDoS attack chain</h2></div>
+          <div><span className="eyebrow">{selectedPathId === "launch-ddos" ? "Detailed showcase pathway" : "Concise scenario pathway"}</span><h2>{selectedScenario?.name} attack chain</h2></div>
           <div className="chain-controls" aria-label="Attack chain playback controls">
             <button className="chain-control" onClick={() => moveStage(-1)} disabled={activeStage === 0} aria-label="Previous attack stage">←</button>
             <button className={isPlaying ? "chain-control play active" : "chain-control play"} onClick={togglePlayback} aria-pressed={isPlaying}>
@@ -83,10 +99,10 @@ export default function AttackPaths() {
           </div>
         </div>
         <div className="chain-progress" aria-hidden="true"><span style={{ width: `${(activeStage / (attackStages.length - 1)) * 100}%` }} /></div>
-        <div className="attack-chain" aria-label="Launch-Day DDoS stages">
+        <div className="attack-chain" aria-label={`${selectedScenario?.name} stages`}>
           {attackStages.map((item, index) => (
             <button
-              key={item.number}
+              key={item.id}
               className={`stage-button${index === activeStage ? " active" : ""}${index < activeStage ? " complete" : ""}`}
               onClick={() => selectStage(index)}
               aria-current={index === activeStage ? "step" : undefined}
