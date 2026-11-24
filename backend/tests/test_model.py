@@ -28,6 +28,11 @@ class SimulationTests(unittest.TestCase):
         self.assertEqual(len(result["sensitivity"]), 3)
         self.assertIn("p99", result["baseline"]["metrics"])
         self.assertEqual(len(result["tornadoSensitivity"]), 4)
+        self.assertTrue(result["controlRecommendations"])
+        self.assertEqual(
+            [item["priorityRank"] for item in result["controlRecommendations"]],
+            list(range(1, len(result["controlRecommendations"]) + 1)),
+        )
 
     def test_unknown_control_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Unknown control"):
@@ -137,6 +142,18 @@ class SimulationTests(unittest.TestCase):
         self.assertEqual(bases["launch-ddos"], "launch-event")
         self.assertTrue(all(bases[key] == "annual" for key in bases if key != "launch-ddos"))
         self.assertIn("p99", result["portfolio"]["baselineMetrics"])
+        self.assertEqual(len(result["controlRecommendations"]), len(CONTROLS))
+
+    def test_standalone_control_economics_use_expected_triangular_cost(self):
+        result = run_simulation(trials=2_000)
+        recommendations = {item["controlId"]: item for item in result["controlRecommendations"]}
+        control = next(item for item in CONTROLS if item["id"] == "cdn-scrubbing")
+        expected = (control["cost"]["low"] + control["cost"]["mode"] + control["cost"]["high"]) / 3
+        self.assertEqual(recommendations[control["id"]]["estimatedCost"], expected)
+        self.assertAlmostEqual(
+            recommendations[control["id"]]["netBenefit"],
+            recommendations[control["id"]]["lossesAvoided"] - expected,
+        )
 
 
 if __name__ == "__main__":

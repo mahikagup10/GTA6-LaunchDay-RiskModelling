@@ -44,7 +44,7 @@ During development, Vite forwards browser requests beginning with `/api` to Flas
 - Compact histogram bins, P50/P90/P95/P99, $10M/$25M/$50M/$100M threshold probabilities, control economics, and sensitivity drivers
 - Automated model tests
 - Interactive Plotly baseline/residual histogram, sensitivity chart, and scenario heat map
-- Detailed Launch-Day DDoS showcase plus selectable four-stage paths for Source Code Theft, Insider Leak, and Fake Downloads & Phishing, with playback, MITRE/STRIDE mappings, control interruption points, evidence labels, and source links
+- Detailed Launch-Day DDoS showcase with technical traffic flow, response timeline, stage substeps, measurable indicators, FAIR-variable connections, and executive decisions; plus concise selectable four-stage paths for Source Code Theft, Insider Leak, and Fake Downloads & Phishing
 - Scenario-aware control categorization with recommendations, applicability, exact model effects, cost ranges, implementation time, confidence, and cross-scenario coverage
 - All-scenario portfolio planner that counts shared controls once, combines trial-by-trial losses, uses DDoS launch-event exposure plus annual exposure for the other scenarios, and reports combined cost, loss reduction, net benefit, ROSI, and scenario-level impact
 - Expandable methodology and evidence register with input provenance, rationale, confidence, source scope, access dates, and framework disclaimers
@@ -60,6 +60,11 @@ During development, Vite forwards browser requests beginning with `/api` to Flas
 - DDoS primary loss exposes its component calculation, assumptions, evidence links, and review warnings
 - Spearman rank sensitivity and low-to-high tornado sensitivity provide two understandable views of influential model inputs
 - Control cost uses the expected value of its triangular range: `(low + most likely + high) / 3`
+- Shared scenario selection now follows the user across Overview, Attack Paths, Simulator, and Planner
+- Standalone control economics rank applicable controls by expected net benefit without a hidden composite score
+- Portfolio P95/P99, threshold probability, and combined loss distribution expose tail risk as well as average loss
+- Natural-period guidance, zero-P50 explanation, run summary, and downloadable JSON scenario summary support interpretation and reporting
+- Heat-map placements include visible team rationales rather than unexplained coordinates
 - Per-control effectiveness evidence with team-estimate labels, rationale, confidence, methodology URL, access date, and validation scope
 
 All four scenarios have reproducible FAIR-style models. Launch-Day DDoS remains the deeply detailed attack-path scenario and primary demo story.
@@ -78,3 +83,5 @@ Then verify the frontend production build:
 cd frontend
 npm run build
 ```
+
+See `DEMO_CHECKLIST.md` for final evidence review, presentation flow, terminology, and emergency fallback preparation.

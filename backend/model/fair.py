@@ -159,6 +159,35 @@ def _expected_cost(controls):
     return sum((item["cost"]["low"] + item["cost"]["mode"] + item["cost"]["high"]) / 3 for item in controls)
 
 
+def _rank_recommendations(items):
+    ranked = sorted(items, key=lambda item: (item["netBenefit"], item["lossesAvoided"]), reverse=True)
+    for rank, item in enumerate(ranked, start=1):
+        item["priorityRank"] = rank
+    return ranked
+
+
+def _scenario_control_recommendations(scenario, inputs, draws, mode, probability, baseline_mean):
+    recommendations = []
+    for control in CONTROLS:
+        if scenario["id"] not in control["coverage"]:
+            continue
+        effects, _ = _effects([control["id"]], scenario["id"])
+        residual_mean = float(np.mean(_losses(inputs, draws, mode, effects, probability)))
+        losses_avoided = baseline_mean - residual_mean
+        cost = _expected_cost([control])
+        recommendations.append({
+            "controlId": control["id"],
+            "lossesAvoided": losses_avoided,
+            "estimatedCost": cost,
+            "netBenefit": losses_avoided - cost,
+            "rosi": (losses_avoided - cost) / cost if cost else None,
+            "implementationWeeks": control["implementationWeeks"],
+            "confidence": control["confidence"],
+            "coverageCount": len(control["coverage"]),
+        })
+    return _rank_recommendations(recommendations)
+
+
 def _arrays(scenario, controls, mode, trials, seed, overrides, profile_id):
     resolved_id, profile = _profile(scenario, profile_id)
     assumptions, probability = _validated_assumptions(profile, overrides)
@@ -183,12 +212,15 @@ def run_simulation(scenario_id="launch-ddos", control_ids=None, mode=None, trial
     baseline_metrics, residual_metrics = _metrics(baseline), _metrics(residual)
     reduction = baseline_metrics["mean"] - residual_metrics["mean"]
     cost = _expected_cost(selected)
+    recommendations = _scenario_control_recommendations(scenario, inputs, draws, mode, probability, baseline_metrics["mean"])
     return {
         "meta": {"scenarioId": scenario_id, "analysisMode": mode, "naturalAnalysisBasis": scenario.get("analysisBasis"), "trials": trials, "seed": seed, "currency": "USD", "assumptionProfileId": profile_id, "assumptionsSource": "custom" if assumptions is not None else "configured", "secondaryLossProbability": probability},
         "baseline": {"metrics": baseline_metrics, "histogram": _histogram(baseline, edges)},
         "residual": {"metrics": residual_metrics, "histogram": _histogram(residual, edges)},
         "comparison": {"expectedLossReduction": reduction, "reductionPercent": reduction / baseline_metrics["mean"] if baseline_metrics["mean"] else 0.0},
         "controlEconomics": {"selectedControlIds": controls, "estimatedCost": cost, "costBasis": "expected triangular cost", "lossesAvoided": reduction, "netBenefit": reduction - cost, "rosi": (reduction - cost) / cost if cost else None},
+        "controlRecommendations": recommendations,
+        "recommendationMethod": "Ranked by standalone expected net benefit; loss avoided breaks ties. Confidence and implementation time are decision context, not hidden score weights.",
         "sensitivity": _sensitivity(inputs, baseline),
         "tornadoSensitivity": _tornado(model_inputs, inputs, draws, mode, probability, scenario_id),
     }
@@ -202,13 +234,14 @@ def run_portfolio(control_ids=None, mode=None, trials=DEFAULT_TRIALS, seed=DEFAU
         if control is None:
             raise ValueError(f"Unknown control: {control_id}")
         selected.append(control)
-    total_baseline, total_residual, summaries = np.zeros(int(trials)), np.zeros(int(trials)), []
+    total_baseline, total_residual, summaries, scenario_models = np.zeros(int(trials)), np.zeros(int(trials)), [], []
     for index, scenario in enumerate(SCENARIOS):
         basis = mode or scenario.get("analysisBasis", "annual")
         applicable = [control["id"] for control in selected if scenario["id"] in control["coverage"]]
-        _, _, _, _, _, _, baseline, residual = _arrays(scenario, applicable, basis, int(trials), int(seed) + index * 9_973, None, assumption_profile_id)
+        _, _, probability, inputs, draws, _, baseline, residual = _arrays(scenario, applicable, basis, int(trials), int(seed) + index * 9_973, None, assumption_profile_id)
         total_baseline += baseline
         total_residual += residual
+        scenario_models.append({"scenario": scenario, "basis": basis, "probability": probability, "inputs": inputs, "draws": draws, "baseline": baseline})
         baseline_mean, residual_mean = float(np.mean(baseline)), float(np.mean(residual))
         summaries.append({"scenarioId": scenario["id"], "scenarioName": scenario["name"], "analysisBasis": basis, "baselineMean": baseline_mean, "residualMean": residual_mean, "lossesAvoided": baseline_mean - residual_mean, "selectedControlIds": applicable})
     baseline_metrics, residual_metrics = _metrics(total_baseline), _metrics(total_residual)
@@ -216,9 +249,24 @@ def run_portfolio(control_ids=None, mode=None, trials=DEFAULT_TRIALS, seed=DEFAU
     edges = np.linspace(0, maximum * 1.001, 31)
     reduction = baseline_metrics["mean"] - residual_metrics["mean"]
     cost = _expected_cost(selected)
+    recommendations = []
+    for control in CONTROLS:
+        standalone_residual = np.zeros(int(trials))
+        for model in scenario_models:
+            if model["scenario"]["id"] in control["coverage"]:
+                effects, _ = _effects([control["id"]], model["scenario"]["id"])
+                standalone_residual += _losses(model["inputs"], model["draws"], model["basis"], effects, model["probability"])
+            else:
+                standalone_residual += model["baseline"]
+        losses_avoided = baseline_metrics["mean"] - float(np.mean(standalone_residual))
+        standalone_cost = _expected_cost([control])
+        recommendations.append({"controlId": control["id"], "lossesAvoided": losses_avoided, "estimatedCost": standalone_cost, "netBenefit": losses_avoided - standalone_cost, "rosi": (losses_avoided - standalone_cost) / standalone_cost if standalone_cost else None, "implementationWeeks": control["implementationWeeks"], "confidence": control["confidence"], "coverageCount": len(control["coverage"])})
+    recommendations = _rank_recommendations(recommendations)
     return {
         "meta": {"analysisMode": mode or "mixed-natural-basis", "trialsPerScenario": int(trials), "seed": int(seed), "currency": "USD", "scenarioCount": len(summaries), "assumptionProfileId": assumption_profile_id or "evidence-anchored"},
         "portfolio": {"baselineMean": baseline_metrics["mean"], "residualMean": residual_metrics["mean"], "baselineMetrics": baseline_metrics, "residualMetrics": residual_metrics, "baselineHistogram": _histogram(total_baseline, edges), "residualHistogram": _histogram(total_residual, edges), "expectedLossReduction": reduction, "reductionPercent": reduction / baseline_metrics["mean"] if baseline_metrics["mean"] else 0.0},
         "controlEconomics": {"selectedControlIds": control_ids, "estimatedCost": cost, "costBasis": "expected triangular cost", "lossesAvoided": reduction, "netBenefit": reduction - cost, "rosi": (reduction - cost) / cost if cost else None},
+        "controlRecommendations": recommendations,
+        "recommendationMethod": "Ranked by standalone portfolio expected net benefit; loss avoided breaks ties. Shared coverage is included without double-counting control cost.",
         "scenarios": summaries,
     }

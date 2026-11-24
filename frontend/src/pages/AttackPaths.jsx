@@ -4,13 +4,13 @@ import { attackStages as fallbackStages, scenarios as fallbackScenarios } from "
 import { useWorkbench } from "../context/WorkbenchContext";
 
 export default function AttackPaths() {
-  const [selectedPathId, setSelectedPathId] = useState("launch-ddos");
   const [activeStage, setActiveStage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { config, demoResetVersion } = useWorkbench();
+  const { config, selectedScenarioId: selectedPathId, setSelectedScenarioId: setSelectedPathId } = useWorkbench();
   const scenarios = config?.scenarios || fallbackScenarios;
   const attackChains = config?.attackChains || { "launch-ddos": config?.attackChain || fallbackStages };
   const attackStages = attackChains[selectedPathId] || attackChains["launch-ddos"] || fallbackStages;
+  const pathDetails = config?.attackPathDetails?.[selectedPathId];
   const selectedScenario = scenarios.find((scenario) => scenario.id === selectedPathId) || scenarios[0];
   const stage = attackStages[activeStage];
   const controlsById = useMemo(
@@ -42,12 +42,6 @@ export default function AttackPaths() {
     setActiveStage(0);
     setIsPlaying(false);
   }, [selectedPathId]);
-
-  useEffect(() => {
-    setSelectedPathId("launch-ddos");
-    setActiveStage(0);
-    setIsPlaying(false);
-  }, [demoResetVersion]);
 
   function selectStage(index) {
     setIsPlaying(false);
@@ -98,6 +92,27 @@ export default function AttackPaths() {
             <button className="chain-control" onClick={() => moveStage(1)} disabled={activeStage === attackStages.length - 1} aria-label="Next attack stage">→</button>
           </div>
         </div>
+
+        {pathDetails && <div className="ddos-deep-dive">
+          <div className="deep-dive-heading">
+            <div><span className="eyebrow">Technical system view</span><h3>How attack traffic becomes business loss</h3></div>
+            <p>{pathDetails.modelConnection}</p>
+          </div>
+          <div className="technical-flow" aria-label="DDoS technical traffic flow">
+            {pathDetails.technicalFlow.map((node, index) => <div className="flow-node" key={node.name}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{node.name}</strong>
+              <small>{node.detail}</small>
+            </div>)}
+          </div>
+          <div className="response-timeline" aria-label="DDoS response timeline">
+            {pathDetails.responseTimeline.map((item) => <div key={item.phase}>
+              <span>{item.phase}</span>
+              <p>{item.decision}</p>
+            </div>)}
+          </div>
+        </div>}
+
         <div className="chain-progress" aria-hidden="true"><span style={{ width: `${(activeStage / (attackStages.length - 1)) * 100}%` }} /></div>
         <div className="attack-chain" aria-label={`${selectedScenario?.name} stages`}>
           {attackStages.map((item, index) => (
@@ -137,6 +152,22 @@ export default function AttackPaths() {
             </article>
           </div>
 
+          {stage.substeps && <div className="ddos-stage-depth">
+            <article>
+              <span className="detail-label">Technical substeps</span>
+              <ol>{stage.substeps.map((substep) => <li key={substep}>{substep}</li>)}</ol>
+            </article>
+            <article>
+              <span className="detail-label">Measurable indicators</span>
+              <div className="indicator-chips">{stage.technicalIndicators.map((indicator) => <span key={indicator}>{indicator}</span>)}</div>
+            </article>
+          </div>}
+
+          {stage.fairEffects && <div className="fair-linkage">
+            <div><span className="eyebrow">Attack-to-model connection</span><h3>How this stage changes quantified risk</h3></div>
+            <div>{stage.fairEffects.map((item) => <article key={item.factor}><strong>{item.factor}</strong><p>{item.effect}</p></article>)}</div>
+          </div>}
+
           <div className="stage-meta-grid">
             <div><span className="detail-label">MITRE ATT&CK</span><strong>{stage.technique}</strong></div>
             <div><span className="detail-label">STRIDE</span><strong>{stage.stride}</strong></div>
@@ -154,6 +185,11 @@ export default function AttackPaths() {
               )) : <span className="control-chip">Control mapping pending</span>}
             </div>
           </div>
+
+          {stage.executiveDecision && <div className="executive-decision">
+            <span className="detail-label">Executive decision at this stage</span>
+            <strong>{stage.executiveDecision}</strong>
+          </div>}
 
           <div className="stage-evidence">
             <span className="detail-label">Evidence and sources</span>

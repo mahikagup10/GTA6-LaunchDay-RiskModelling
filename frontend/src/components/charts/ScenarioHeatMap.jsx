@@ -7,10 +7,10 @@ const matrix = levels.map((_, impactIndex) => (
 ));
 
 const scenarioPositions = [
-  { name: "Launch DDoS", x: 4, y: 5 },
-  { name: "Source theft", x: 3, y: 4 },
-  { name: "Insider leak", x: 3, y: 4 },
-  { name: "Fake downloads", x: 4, y: 3 },
+  { name: "Launch DDoS", x: 4, y: 5, rationale: "High-profile launch exposure with potentially severe availability and revenue consequences." },
+  { name: "Source theft", x: 3, y: 4, rationale: "Less frequent targeted access, but potentially major intellectual-property and launch effects." },
+  { name: "Insider leak", x: 3, y: 4, rationale: "Trusted access creates opportunity, while material disclosures remain less frequent." },
+  { name: "Fake downloads", x: 4, y: 3, rationale: "Impersonation campaigns may be frequent, but individual campaign impact is generally more contained." },
 ];
 
 export default function ScenarioHeatMap() {
@@ -41,6 +41,7 @@ export default function ScenarioHeatMap() {
             x: scenarioPositions.map((item) => item.x),
             y: scenarioPositions.map((item) => item.y),
             text: scenarioPositions.map((item) => item.name),
+            customdata: scenarioPositions.map((item) => item.rationale),
             textposition: ["top center", "bottom left", "top right", "bottom center"],
             textfont: { color: "#ffffff", size: 10 },
             marker: {
@@ -49,7 +50,7 @@ export default function ScenarioHeatMap() {
               line: { color: "#ffffff", width: 2 },
               symbol: "diamond",
             },
-            hovertemplate: "%{text}<br>Likelihood: %{x}/5<br>Impact: %{y}/5<extra></extra>",
+            hovertemplate: "%{text}<br>Likelihood: %{x}/5<br>Impact: %{y}/5<br>%{customdata}<extra></extra>",
           },
         ]}
         layout={{
@@ -80,6 +81,9 @@ export default function ScenarioHeatMap() {
         useResizeHandler
         style={{ width: "100%", height: "310px" }}
       />
+      <div className="heatmap-rationales">
+        {scenarioPositions.map((scenario) => <div key={scenario.name}><strong>{scenario.name}</strong><p>{scenario.rationale}</p></div>)}
+      </div>
     </div>
   );
 }

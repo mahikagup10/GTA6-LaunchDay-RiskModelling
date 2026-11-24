@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
+import LossDistributionChart from "../components/charts/LossDistributionChart";
 import { controls as fallbackControls } from "../data/mockData";
 import { useWorkbench } from "../context/WorkbenchContext";
 import { simulatePortfolio } from "../services/api";
 import { cachePortfolio, readCachedPortfolio } from "../utils/cache";
-import { formatCurrency } from "../utils/formatters";
+import { formatCurrency, formatPercent } from "../utils/formatters";
 
 export default function ControlPlanner() {
   const { config, results, status, assumptionProfileId, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
@@ -24,6 +25,9 @@ export default function ControlPlanner() {
   const avoidedLoss = economics?.lossesAvoided || 0;
   const netBenefit = economics?.netBenefit || 0;
   const rosi = economics?.rosi || 0;
+  const recommendations = plannerMode === "portfolio" ? portfolioResults?.controlRecommendations || [] : results?.controlRecommendations || [];
+  const recommendationById = Object.fromEntries(recommendations.map((item) => [item.controlId, item]));
+  const prioritySort = (left, right) => (recommendationById[left.id]?.priorityRank || 999) - (recommendationById[right.id]?.priorityRank || 999);
 
   useEffect(() => {
     if (config && portfolioControlIds === null) {
@@ -78,11 +82,11 @@ export default function ControlPlanner() {
     return () => { cancelled = true; };
   }, [assumptionProfileId, plannerMode, portfolioControlIds]);
 
-  const recommendedControls = controls.filter((control) => recommendedIds.includes(control.id));
+  const recommendedControls = controls.filter((control) => recommendedIds.includes(control.id)).sort(prioritySort);
   const additionalControls = controls.filter((control) => (
     !recommendedIds.includes(control.id)
     && (!control.coverage || control.coverage.includes(selectedScenarioId))
-  ));
+  )).sort(prioritySort);
   const otherScenarioControls = controls.filter((control) => (
     control.coverage && !control.coverage.includes(selectedScenarioId)
   ));
@@ -127,6 +131,10 @@ export default function ControlPlanner() {
     const applicable = portfolioMode || !control.coverage || control.coverage.includes(selectedScenarioId);
     const implementation = control.implementationWeeks;
     const toggle = portfolioMode ? togglePortfolioControl : toggleControl;
+    const recommendation = recommendationById[control.id];
+    const expectedCost = control.cost.low != null
+      ? (control.cost.low + control.cost.mode + control.cost.high) / 3
+      : control.cost;
 
     return (
       <article className={`control-card${selected ? " selected" : ""}${!applicable ? " unavailable" : ""}`} key={control.id}>
@@ -139,6 +147,12 @@ export default function ControlPlanner() {
           </div>
           <p>{applicable ? effectSummary(control) : `Switch to ${control.coverage.map((id) => scenarioNames[id] || id).join(" or ")} to enable`}</p>
           {control.coverage && <small>Coverage: {control.coverage.map((id) => scenarioNames[id] || id).join(", ")}</small>}
+          {recommendation && <div className="standalone-economics">
+            <span><small>Priority</small><strong>#{recommendation.priorityRank}</strong></span>
+            <span><small>Loss avoided</small><strong>{formatCurrency(recommendation.lossesAvoided)}</strong></span>
+            <span><small>Net benefit</small><strong>{formatCurrency(recommendation.netBenefit)}</strong></span>
+            <span><small>ROSI</small><strong>{recommendation.rosi == null ? "—" : `${recommendation.rosi.toFixed(1)}×`}</strong></span>
+          </div>}
           {control.effectEvidence && <details className="control-evidence">
             <summary>Why these effect estimates?</summary>
             <p>{control.effectEvidence.rationale}</p>
@@ -147,7 +161,7 @@ export default function ControlPlanner() {
             <small>Accessed {control.effectEvidence.source.accessDate}. {control.effectEvidence.source.scope}</small>
           </details>}
         </div>
-        <div><span>Estimated cost</span><strong>{formatCurrency(control.cost.mode ?? control.cost)}</strong><small>{control.cost.low != null && `${formatCurrency(control.cost.low)}–${formatCurrency(control.cost.high)}`}</small></div>
+        <div><span>Expected modelled cost</span><strong>{formatCurrency(expectedCost)}</strong><small>{control.cost.low != null && `${formatCurrency(control.cost.low)}–${formatCurrency(control.cost.high)} range · ${formatCurrency(control.cost.mode)} most likely`}</small></div>
         <div><span>Implementation</span><strong>{implementation ? `${implementation.mode} weeks` : "—"}</strong><small>{implementation && `${implementation.low}–${implementation.high} week range`}</small></div>
         <div><span>Confidence</span><strong>{control.confidence}</strong></div>
       </article>
@@ -192,7 +206,7 @@ export default function ControlPlanner() {
       </div>
       {plannerMode === "scenario" ? (
         <section className="planner-guide" aria-label="Control availability guide">
-          <div><span className="guide-mark recommended" /><strong>Recommended</strong><p>Preselected for the current scenario.</p></div>
+          <div><span className="guide-mark recommended" /><strong>Pathway-preselected</strong><p>Directly mapped to the scenario; financial priority is shown on each card.</p></div>
           <div><span className="guide-mark available" /><strong>Additional</strong><p>Applicable and available to test.</p></div>
           <div><span className="guide-mark unavailable" /><strong>Other scenario</strong><p>Switch scenarios to enable it.</p></div>
         </section>
@@ -210,6 +224,19 @@ export default function ControlPlanner() {
         <div><span>Net benefit</span><strong>{formatCurrency(netBenefit)}</strong></div>
         <div><span>Modelled ROSI</span><strong>{rosi.toFixed(1)}×</strong></div>
       </section>
+      {plannerMode === "portfolio" && portfolioResults && <>
+        <section className="metric-grid portfolio-tail-grid">
+          <div className="metric-card"><span>Baseline portfolio P95</span><strong>{formatCurrency(portfolioResults.portfolio.baselineMetrics.p95)}</strong><small>Severe combined outcome</small></div>
+          <div className="metric-card success"><span>Residual portfolio P95</span><strong>{formatCurrency(portfolioResults.portfolio.residualMetrics.p95)}</strong><small>With selected controls</small></div>
+          <div className="metric-card"><span>Baseline portfolio P99</span><strong>{formatCurrency(portfolioResults.portfolio.baselineMetrics.p99)}</strong><small>Extreme tail outcome</small></div>
+          <div className="metric-card success"><span>Residual above $100M</span><strong>{formatPercent(portfolioResults.portfolio.residualMetrics.probabilityAbove100m)}</strong><small>Selected-control tail probability</small></div>
+        </section>
+        <article className="panel portfolio-distribution">
+          <span className="eyebrow">Combined portfolio distribution</span>
+          <LossDistributionChart baseline={portfolioResults.portfolio.baselineHistogram} residual={portfolioResults.portfolio.residualHistogram} />
+          <small>Each trial combines launch-event DDoS with annual losses from the other three scenarios.</small>
+        </article>
+      </>}
       {plannerMode === "portfolio" && portfolioResults && (
         <section className="portfolio-breakdown panel">
           <div className="control-section-heading">
@@ -235,11 +262,12 @@ export default function ControlPlanner() {
       )}
       {plannerMode === "scenario" ? (
         <>
-          {controlSection("Recommended for this scenario", "The model starts with these controls selected because they best match the scenario pathway.", recommendedControls, true)}
+          {controlSection("Pathway-preselected controls", "The model starts with these controls because they directly interrupt the scenario pathway. Priority numbers separately rank standalone expected net benefit.", recommendedControls, true)}
           {controlSection("Additional applicable controls", "These controls also cover the selected scenario and can be toggled into the comparison.", additionalControls)}
           {controlSection("Controls for other scenarios", "These remain visible for cross-scenario planning but cannot affect the current model.", otherScenarioControls)}
         </>
-      ) : controlSection("Portfolio controls", "Toggle any control to test its organization-wide cost and combined modelled benefit.", controls, false, true)}
+      ) : controlSection("Portfolio controls", "Controls are ordered by standalone portfolio net benefit. Toggle any combination to test organization-wide cost and benefit.", [...controls].sort(prioritySort), false, true)}
+      {recommendations.length > 0 && <p className="model-note"><strong>Recommendation method:</strong> {plannerMode === "portfolio" ? portfolioResults?.recommendationMethod : results?.recommendationMethod} Standalone values are not additive because controls can overlap.</p>}
       <p className="model-note">{(plannerMode === "portfolio" ? portfolioStatus === "loading" : status === "loading") ? "Recalculating control economics…" : plannerMode === "portfolio" ? "Portfolio economics sum expected loss across four separate scenario models; shared control costs are counted once." : "Control economics are calculated by the same fixed-seed simulation used across all four pages."}</p>
     </div>
   );

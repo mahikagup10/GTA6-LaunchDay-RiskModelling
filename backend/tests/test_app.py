@@ -78,6 +78,21 @@ class AppRoutingTests(unittest.TestCase):
                     self.assertTrue(stage["attackerAction"])
                     self.assertTrue(stage["businessEffect"])
 
+    def test_ddos_has_deep_dive_content_without_expanding_other_paths(self):
+        payload = self.client.get("/api/config").get_json()
+        self.assertEqual(set(payload["attackPathDetails"]), {"launch-ddos"})
+        details = payload["attackPathDetails"]["launch-ddos"]
+        self.assertEqual(len(details["technicalFlow"]), 5)
+        self.assertEqual(len(details["responseTimeline"]), 4)
+        for stage in payload["attackChains"]["launch-ddos"]:
+            self.assertGreaterEqual(len(stage["substeps"]), 3)
+            self.assertGreaterEqual(len(stage["technicalIndicators"]), 4)
+            self.assertTrue(stage["fairEffects"])
+            self.assertTrue(stage["executiveDecision"])
+        for scenario_id in ("source-code-theft", "insider-leak", "fake-downloads"):
+            for stage in payload["attackChains"][scenario_id]:
+                self.assertNotIn("substeps", stage)
+
 
 if __name__ == "__main__":
     unittest.main()

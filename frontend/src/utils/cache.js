@@ -1,4 +1,4 @@
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 const CONFIG_KEY = "cyber-workbench:config";
 const SIMULATION_PREFIX = "cyber-workbench:simulation:";
 const PORTFOLIO_PREFIX = "cyber-workbench:portfolio:";

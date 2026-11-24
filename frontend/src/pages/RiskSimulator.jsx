@@ -81,6 +81,7 @@ export default function RiskSimulator() {
     setAnalysisMode,
     assumptionProfileId,
     setAssumptionProfileId,
+    selectedControlIds,
     results,
     status,
     currentAppliedAssumptions,
@@ -108,6 +109,8 @@ export default function RiskSimulator() {
   );
   const hasUnappliedChanges = JSON.stringify(draft) !== JSON.stringify(savedDraft);
   const isRunning = status === "loading" || status === "refreshing";
+  const naturalBasis = selectedScenario?.analysisBasis || "annual";
+  const usesNaturalBasis = analysisMode === naturalBasis;
 
   function updateDraft(assumptionKey, estimateKey, value) {
     setDraft((current) => ({
@@ -135,6 +138,38 @@ export default function RiskSimulator() {
     resetScenarioAssumptions();
   }
 
+  function downloadScenarioSummary() {
+    if (!selectedScenario || !results) return;
+    const summary = {
+      generatedAt: new Date().toISOString(),
+      scenario: { id: selectedScenario.id, name: selectedScenario.name, summary: selectedScenario.summary },
+      model: {
+        methodology: config?.methodology?.name,
+        analysisMode,
+        naturalAnalysisBasis: naturalBasis,
+        assumptionProfile: selectedProfile?.name,
+        trials: results.meta.trials,
+        seed: results.meta.seed,
+        secondaryLossProbability: results.meta.secondaryLossProbability,
+      },
+      assumptions: currentAppliedAssumptions || configuredAssumptions,
+      selectedControlIds,
+      baseline: results.baseline.metrics,
+      residual: results.residual.metrics,
+      comparison: results.comparison,
+      controlEconomics: results.controlEconomics,
+      sensitivity: results.sensitivity,
+      note: "Team FAIR-style decision-support model; not an official FAIR or NIST assessment.",
+    };
+    const blob = new Blob([JSON.stringify(summary, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${selectedScenario.id}-risk-summary.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   const statistics = [
     ["Mean", baseline?.mean, residual?.mean, formatCurrency],
     ["P50", baseline?.p50, residual?.p50, formatCurrency],
@@ -150,16 +185,22 @@ export default function RiskSimulator() {
   return (
     <div className="page">
       <PageHeader eyebrow="FAIR-style analysis" title="Risk Simulator" description="Edit transparent frequency, vulnerability, and loss assumptions, then run reproducible Monte Carlo analysis.">
-        <label className="select-label">
-          Scenario
-          <select value={selectedScenarioId} onChange={(event) => setSelectedScenarioId(event.target.value)}>
-            {scenarios.map((scenario) => <option key={scenario.id} value={scenario.id}>{scenario.name}</option>)}
-          </select>
-        </label>
+        <div className="simulator-header-actions">
+          <label className="select-label">Scenario
+            <select value={selectedScenarioId} onChange={(event) => setSelectedScenarioId(event.target.value)}>
+              {scenarios.map((scenario) => <option key={scenario.id} value={scenario.id}>{scenario.name}</option>)}
+            </select>
+          </label>
+          <button className="secondary-button" onClick={downloadScenarioSummary} disabled={!results}>Download summary</button>
+        </div>
       </PageHeader>
       <div className="segmented-control" aria-label="Analysis mode">
         <button className={analysisMode === "launch-event" ? "active" : ""} aria-pressed={analysisMode === "launch-event"} onClick={() => setAnalysisMode("launch-event")}>Launch event</button>
         <button className={analysisMode === "annual" ? "active" : ""} aria-pressed={analysisMode === "annual"} onClick={() => setAnalysisMode("annual")}>Annual</button>
+      </div>
+      <div className={usesNaturalBasis ? "basis-notice" : "basis-notice warning"}>
+        <strong>Recommended basis: {naturalBasis === "launch-event" ? "Launch event" : "Annual"}.</strong>
+        <span>{usesNaturalBasis ? " Current results use the scenario's natural decision period." : " You selected a different period; interpret and document the comparison carefully."}</span>
       </div>
       <div className="profile-row">
         <label className="select-label">Assumption profile
@@ -169,6 +210,14 @@ export default function RiskSimulator() {
         </label>
         <p><strong>{selectedProfile?.name}:</strong> {selectedProfile?.description}</p>
       </div>
+      <section className="model-run-summary" aria-label="Current model run summary">
+        <div><span>Scenario</span><strong>{selectedScenario?.name}</strong></div>
+        <div><span>Period</span><strong>{analysisMode === "launch-event" ? "Launch event" : "Annual"}</strong></div>
+        <div><span>Profile</span><strong>{selectedProfile?.name || assumptionProfileId}</strong></div>
+        <div><span>Trials</span><strong>{results?.meta.trials?.toLocaleString() || "10,000"}</strong></div>
+        <div><span>Seed</span><strong>{results?.meta.seed ?? 243}</strong></div>
+        <div><span>Secondary-loss chance</span><strong>{formatPercent(results?.meta.secondaryLossProbability ?? configuredSecondaryProbability)}</strong></div>
+      </section>
 
       <section className="simulator-grid">
         <article className="panel inputs-panel">
@@ -227,6 +276,7 @@ export default function RiskSimulator() {
                 ))}</tbody>
               </table>
             </div>
+            {(baseline?.p50 === 0 || residual?.p50 === 0) && <p className="p50-explanation"><strong>Why is P50 $0?</strong> At least half of simulated periods had no successful material loss event. Less frequent successful events still create a positive mean and upper-tail loss.</p>}
           </article>
           <article className="panel interactive-chart-panel">
             <span className="eyebrow">Loss distribution</span>

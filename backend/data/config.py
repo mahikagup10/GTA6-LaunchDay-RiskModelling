@@ -608,6 +608,86 @@ ATTACK_CHAIN = [
 ]
 
 
+DDOS_STAGE_DETAILS = {
+    "reconnaissance": {
+        "substeps": [
+            "Enumerate public DNS, APIs, login endpoints, status pages, and origin exposure.",
+            "Probe request limits and compare how edge and origin services respond.",
+            "Identify the launch services whose failure would create the greatest customer impact.",
+        ],
+        "technicalIndicators": ["Scanning across many endpoints", "Repeated 4xx responses", "Unusual pre-launch geographies", "Short test bursts"],
+        "fairEffects": [
+            {"factor": "Threat event frequency", "effect": "Successful reconnaissance can increase the chance that a serious launch-window attack is attempted."},
+            {"factor": "Vulnerability", "effect": "Discovered origin exposure or weak rate limits can increase conditional attack success."},
+        ],
+        "executiveDecision": "Confirm whether pre-launch scanning triggers escalation and whether exposed origin services must be hidden before launch.",
+    },
+    "botnet-preparation": {
+        "substeps": [
+            "Acquire or rent distributed botnet and reflection capacity.",
+            "Test small floods against public endpoints and refine traffic patterns.",
+            "Prepare multiple traffic sources and application-layer requests to evade simple blocking.",
+        ],
+        "technicalIndicators": ["Known botnet reputation matches", "Small volumetric test floods", "Distributed source growth", "Repeated application-layer probes"],
+        "fairEffects": [
+            {"factor": "Threat event frequency", "effect": "Available attack infrastructure makes repeated launch-window attempts more feasible."},
+            {"factor": "Vulnerability", "effect": "A larger and more diverse botnet raises the chance that mitigation capacity will be exceeded."},
+        ],
+        "executiveDecision": "Decide whether contracted scrubbing capacity, routing procedures, and provider contacts are sufficient and tested.",
+    },
+    "traffic-flood": {
+        "substeps": [
+            "Generate volumetric traffic against network links, DNS, CDN, and public endpoints.",
+            "Mix malicious requests with legitimate launch demand to make filtering harder.",
+            "Shift targets or traffic types when defenders activate mitigation.",
+        ],
+        "technicalIndicators": ["Bandwidth saturation", "Connection-rate spike", "Origin CPU or queue growth", "Latency and 5xx errors", "Geographic anomalies"],
+        "fairEffects": [
+            {"factor": "Vulnerability", "effect": "Scrubbing and adaptive rate limiting directly reduce the probability that the flood causes material disruption."},
+            {"factor": "Primary loss", "effect": "Earlier mitigation shortens outage duration and reduces response, restoration, and unrecovered revenue loss."},
+        ],
+        "executiveDecision": "Authorize upstream scrubbing and protective traffic restrictions before origin capacity or customer transactions fail.",
+    },
+    "business-disruption": {
+        "substeps": [
+            "Customer-facing services become slow, intermittent, or unavailable.",
+            "Operations prioritize essential services and communicate with customers and partners.",
+            "Teams restore normal routing, validate stability, and address downstream consequences.",
+        ],
+        "technicalIndicators": ["Availability below target", "Failed purchases or logins", "Support-volume spike", "Recovery backlog", "Public incident reports"],
+        "fairEffects": [
+            {"factor": "Primary loss", "effect": "Outage duration, response effort, and unrecovered launch activity determine direct financial loss."},
+            {"factor": "Secondary loss", "effect": "Customer, partner, reputation, or contractual consequences may occur after the disruption."},
+            {"factor": "Secondary-loss probability", "effect": "The model applies secondary loss to only a defined share of successful events, rather than every event."},
+        ],
+        "executiveDecision": "Choose service priorities, recovery thresholds, and stakeholder communications while technical mitigation remains active.",
+    },
+}
+
+for _ddos_stage in ATTACK_CHAIN:
+    _ddos_stage.update(DDOS_STAGE_DETAILS[_ddos_stage["id"]])
+
+
+ATTACK_PATH_DETAILS = {
+    "launch-ddos": {
+        "technicalFlow": [
+            {"name": "Attacker", "detail": "Chooses launch-critical targets"},
+            {"name": "Distributed botnet", "detail": "Generates volumetric and application traffic"},
+            {"name": "Internet / CDN", "detail": "Scrubs, filters, and rate-limits requests"},
+            {"name": "Origin services", "detail": "APIs, identity, commerce, and launch systems"},
+            {"name": "Customers", "detail": "Experience successful access, delay, or outage"},
+        ],
+        "responseTimeline": [
+            {"phase": "Before launch", "decision": "Validate capacity, routing, monitoring, contacts, and incident roles."},
+            {"phase": "Attack onset", "decision": "Confirm malicious traffic and activate upstream mitigation."},
+            {"phase": "Active mitigation", "decision": "Protect priority services and adjust filters without blocking legitimate demand."},
+            {"phase": "Recovery", "decision": "Restore normal operation, verify stability, communicate, and capture lessons."},
+        ],
+        "modelConnection": "The attack chain explains why frequency, vulnerability, primary loss, secondary loss, and secondary-loss probability change. The Risk Simulator quantifies those uncertain factors over 10,000 trials.",
+    }
+}
+
+
 # DDoS remains the deeply researched showcase. The other paths are concise,
 # decision-oriented narratives that reuse the same interaction pattern.
 ATTACK_CHAINS = {
