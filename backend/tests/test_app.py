@@ -23,7 +23,7 @@ class AppRoutingTests(unittest.TestCase):
     def test_portfolio_endpoint_returns_four_scenarios(self):
         response = self.client.post(
             "/api/portfolio",
-            json={"controlIds": [], "trials": 2_000, "seed": 243},
+            json={"controlIds": [], "trials": 2_000, "seed": 20261124},
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.get_json()["scenarios"]), 4)

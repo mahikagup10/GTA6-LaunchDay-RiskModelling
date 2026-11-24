@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 from backend.data.config import ATTACK_CHAIN, CONTROLS, METHODOLOGY, SCENARIOS, SOURCES
-from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_portfolio, run_simulation
+from backend.model.fair import DEFAULT_SEED, DEFAULT_TRIALS, run_control_priorities, run_portfolio, run_simulation
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -31,7 +31,8 @@ def config():
             "model": {
                 "trials": DEFAULT_TRIALS,
                 "seed": DEFAULT_SEED,
-                "status": "launch-ddos-implemented",
+                "status": "four-scenarios-implemented",
+                "inputSet": "evidence-anchored (Set A)",
             },
         }
     )
@@ -44,7 +45,6 @@ def simulate():
         result = run_simulation(
             scenario_id=payload.get("scenarioId", "launch-ddos"),
             control_ids=payload.get("controlIds", []),
-            mode=payload.get("analysisMode", "launch-event"),
             trials=payload.get("trials", DEFAULT_TRIALS),
             seed=payload.get("seed", DEFAULT_SEED),
         )
@@ -59,13 +59,17 @@ def portfolio():
     try:
         result = run_portfolio(
             control_ids=payload.get("controlIds"),
-            mode=payload.get("analysisMode", "launch-event"),
             trials=payload.get("trials", DEFAULT_TRIALS),
             seed=payload.get("seed", DEFAULT_SEED),
         )
     except (TypeError, ValueError) as error:
         return jsonify({"error": str(error)}), 400
     return jsonify(result)
+
+
+@app.get("/api/priorities")
+def priorities():
+    return jsonify(run_control_priorities())
 
 
 @app.get("/assets/<path:filename>")

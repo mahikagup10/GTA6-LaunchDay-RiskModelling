@@ -10,7 +10,7 @@ export function formatCurrency(value) {
 export function formatPercent(value) {
   return new Intl.NumberFormat("en-US", {
     style: "percent",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 1,
   }).format(value);
 }
 

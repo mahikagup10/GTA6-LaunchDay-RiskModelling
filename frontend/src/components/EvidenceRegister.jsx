@@ -45,11 +45,13 @@ export default function EvidenceRegister({ scenario, methodology, sources = [] }
           <span className="detail-label">Control treatment</span>
           <strong>Explicit parameter multipliers</strong>
           <p>{methodology.controlRule}</p>
+          {methodology.disclaimer && <p className="model-disclaimer">{methodology.disclaimer}</p>}
         </div>
       </div>
 
       <div className="evidence-legend" aria-label="Evidence type legend">
         <span><i className="legend-dot fact" />Public fact</span>
+        <span><i className="legend-dot derived" />Derived value</span>
         <span><i className="legend-dot estimate" />Team estimate</span>
         <span><i className="legend-dot assumption" />Model assumption</span>
       </div>
@@ -77,7 +79,7 @@ export default function EvidenceRegister({ scenario, methodology, sources = [] }
             </div>
             <div className="provenance-note">
               <a href={assumption.source.url} target="_blank" rel="noreferrer">{assumption.source.title}</a>
-              <small>Accessed {assumption.source.accessDate}</small>
+              <small>Accessed {assumption.source.accessDate}{assumption.evidenceRef ? ` · Evidence ${assumption.evidenceRef}` : ""}{assumption.source.anchorIds?.length ? ` · Anchors ${assumption.source.anchorIds.join(", ")}` : ""}</small>
               <p>{assumption.source.scope}</p>
             </div>
           </article>

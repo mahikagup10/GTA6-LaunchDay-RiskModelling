@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import { controls as fallbackControls } from "../data/mockData";
-import { useWorkbench } from "../context/WorkbenchContext";
-import { simulatePortfolio } from "../services/api";
+import { MODEL_SEED, useWorkbench } from "../context/WorkbenchContext";
+import { getPriorities, simulatePortfolio } from "../services/api";
 import { cachePortfolio, readCachedPortfolio } from "../utils/cache";
 import { formatCurrency } from "../utils/formatters";
 
 export default function ControlPlanner() {
-  const { config, results, status, analysisMode, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
+  const { config, results, status, selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, demoResetVersion } = useWorkbench();
   const [plannerMode, setPlannerMode] = useState("scenario");
   const [portfolioControlIds, setPortfolioControlIds] = useState(null);
   const [portfolioResults, setPortfolioResults] = useState(null);
   const [portfolioStatus, setPortfolioStatus] = useState("idle");
   const [portfolioError, setPortfolioError] = useState("");
+  const [priorities, setPriorities] = useState(null);
   const controls = config?.controls || fallbackControls;
   const scenarios = config?.scenarios || [];
   const selectedScenario = scenarios.find((scenario) => scenario.id === selectedScenarioId);
@@ -24,6 +25,10 @@ export default function ControlPlanner() {
   const avoidedLoss = economics?.lossesAvoided || 0;
   const netBenefit = economics?.netBenefit || 0;
   const rosi = economics?.rosi || 0;
+
+  useEffect(() => {
+    getPriorities().then(setPriorities).catch(() => setPriorities(null));
+  }, []);
 
   useEffect(() => {
     if (config && portfolioControlIds === null) {
@@ -47,9 +52,8 @@ export default function ControlPlanner() {
 
     const payload = {
       controlIds: portfolioControlIds,
-      analysisMode,
       trials: 10_000,
-      seed: 243,
+      seed: MODEL_SEED,
     };
 
     simulatePortfolio(payload)
@@ -76,7 +80,7 @@ export default function ControlPlanner() {
       });
 
     return () => { cancelled = true; };
-  }, [analysisMode, plannerMode, portfolioControlIds]);
+  }, [plannerMode, portfolioControlIds]);
 
   const recommendedControls = controls.filter((control) => recommendedIds.includes(control.id));
   const additionalControls = controls.filter((control) => (
@@ -140,7 +144,7 @@ export default function ControlPlanner() {
           <p>{applicable ? effectSummary(control) : `Switch to ${control.coverage.map((id) => scenarioNames[id] || id).join(" or ")} to enable`}</p>
           {control.coverage && <small>Coverage: {control.coverage.map((id) => scenarioNames[id] || id).join(", ")}</small>}
         </div>
-        <div><span>Estimated cost</span><strong>{formatCurrency(control.cost.mode ?? control.cost)}</strong><small>{control.cost.low != null && `${formatCurrency(control.cost.low)}–${formatCurrency(control.cost.high)}`}</small></div>
+        <div><span>Expected cost (low–high)</span><strong>{formatCurrency(control.cost.expected ?? control.cost.mode ?? control.cost)}</strong><small>{control.cost.low != null && `${formatCurrency(control.cost.low)}–${formatCurrency(control.cost.high)}`}</small></div>
         <div><span>Implementation</span><strong>{implementation ? `${implementation.mode} weeks` : "—"}</strong><small>{implementation && `${implementation.low}–${implementation.high} week range`}</small></div>
         <div><span>Confidence</span><strong>{control.confidence}</strong></div>
       </article>
@@ -206,18 +210,21 @@ export default function ControlPlanner() {
       {plannerMode === "portfolio" && portfolioResults && (
         <section className="portfolio-breakdown panel">
           <div className="control-section-heading">
-            <div><h2>Scenario-by-scenario impact</h2><p>Combined exposure is the sum of the four modelled scenario means.</p></div>
+            <div><h2>Scenario-by-scenario impact</h2><p>Portfolio = one launch window + one year of the other three scenarios, summed trial by trial. Portfolio P95: {formatCurrency(portfolioResults.portfolio.baselineP95)} baseline, {formatCurrency(portfolioResults.portfolio.residualP95)} residual.</p></div>
             <span>{portfolioResults.meta.trialsPerScenario.toLocaleString()} trials each</span>
           </div>
           <div className="portfolio-table-wrap">
             <table className="portfolio-table">
-              <thead><tr><th>Scenario</th><th>Baseline</th><th>Residual</th><th>Loss avoided</th><th>Controls</th></tr></thead>
+              <thead><tr><th>Scenario</th><th>Basis</th><th>Baseline mean</th><th>Residual mean</th><th>Baseline P95</th><th>Loss avoided</th><th>Allocated cost</th><th>Controls</th></tr></thead>
               <tbody>{portfolioResults.scenarios.map((scenario) => (
                 <tr key={scenario.scenarioId}>
                   <td>{scenario.scenarioName}</td>
+                  <td>{scenario.analysisBasis === "launch-window" ? "7-day launch window" : "per year"}</td>
                   <td>{formatCurrency(scenario.baselineMean)}</td>
                   <td>{formatCurrency(scenario.residualMean)}</td>
+                  <td>{formatCurrency(scenario.baselineP95)}</td>
                   <td>{formatCurrency(scenario.lossesAvoided)}</td>
+                  <td>{formatCurrency(scenario.allocatedCost)}</td>
                   <td>{scenario.selectedControlIds.length}</td>
                 </tr>
               ))}</tbody>
@@ -232,7 +239,30 @@ export default function ControlPlanner() {
           {controlSection("Controls for other scenarios", "These remain visible for cross-scenario planning but cannot affect the current model.", otherScenarioControls)}
         </>
       ) : controlSection("Portfolio controls", "Toggle any control to test its organization-wide cost and combined modelled benefit.", controls, false, true)}
-      <p className="model-note">{(plannerMode === "portfolio" ? portfolioStatus === "loading" : status === "loading") ? "Recalculating control economics…" : plannerMode === "portfolio" ? "Portfolio economics sum expected loss across four separate scenario models; shared control costs are counted once." : "Control economics are calculated by the same fixed-seed simulation used across all four pages."}</p>
+      {priorities && (
+        <section className="panel priority-panel">
+          <div className="control-section-heading">
+            <div><h2>Control priority ranking</h2><p>Each control evaluated alone with analytic expected loss. Score weights and tier cutoffs (P1 ≥ 60, P2 ≥ 40) are team policy assumptions.</p></div>
+            <span>Same scoring as the Excel workbook</span>
+          </div>
+          <div className="priority-table-wrap">
+            <table className="priority-table">
+              <thead><tr><th>Control</th><th>Expected cost</th><th>Loss avoided</th><th>ROSI</th><th>Score</th><th>Tier</th></tr></thead>
+              <tbody>{priorities.controls.map((row) => (
+                <tr key={row.controlId}>
+                  <td>{row.name}</td>
+                  <td>{formatCurrency(row.expectedCost)}</td>
+                  <td>{formatCurrency(row.totalLossAvoided)}</td>
+                  <td>{row.rosi.toFixed(1)}×</td>
+                  <td>{row.priorityScore.toFixed(1)}</td>
+                  <td>{row.tier}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </section>
+      )}
+      <p className="model-note">{(plannerMode === "portfolio" ? portfolioStatus === "loading" : status === "loading") ? "Recalculating control economics…" : plannerMode === "portfolio" ? "Portfolio economics sum expected loss across four separate scenario models; shared control costs are counted once." : "Costs are expected (triangular-mean) values, split equally across the scenarios each control covers. Control effects are team estimates, not vendor-measured."}</p>
     </div>
   );
 }

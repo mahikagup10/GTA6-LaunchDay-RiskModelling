@@ -50,3 +50,7 @@ export function simulatePortfolio(payload) {
   });
 }
 
+
+export function getPriorities() {
+  return request("/api/priorities");
+}

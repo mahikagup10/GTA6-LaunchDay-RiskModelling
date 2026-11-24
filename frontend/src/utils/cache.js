@@ -28,7 +28,7 @@ function writeEnvelope(key, data) {
 
 export function simulationRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.scenarioId}:${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  return `v2:${payload.scenarioId}:${payload.trials}:${payload.seed}:${controls}`;
 }
 
 export function readCachedConfig() {
@@ -49,7 +49,7 @@ export function cacheSimulation(payload, results) {
 
 function portfolioRequestKey(payload) {
   const controls = [...payload.controlIds].sort().join(",") || "none";
-  return `${payload.analysisMode}:${payload.trials}:${payload.seed}:${controls}`;
+  return `v2:${payload.trials}:${payload.seed}:${controls}`;
 }
 
 export function readCachedPortfolio(payload) {

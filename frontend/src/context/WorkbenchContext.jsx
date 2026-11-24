@@ -8,11 +8,13 @@ import {
   simulationRequestKey,
 } from "../utils/cache";
 
+// Same seed and trial count as GTA6_FAIR_Monte_Carlo.xlsx so the app and workbook agree exactly.
+export const MODEL_SEED = 20261124;
+
 const WorkbenchContext = createContext(null);
 
 export function WorkbenchProvider({ children }) {
   const [selectedScenarioId, setSelectedScenarioIdState] = useState("launch-ddos");
-  const [analysisMode, setAnalysisMode] = useState("launch-event");
   const [selectedControlIds, setSelectedControlIds] = useState([
     "cdn-scrubbing",
     "rate-limiting",
@@ -56,9 +58,8 @@ export function WorkbenchProvider({ children }) {
     const payload = {
       scenarioId: selectedScenarioId,
       controlIds: selectedControlIds,
-      analysisMode,
       trials: 10_000,
-      seed: 243,
+      seed: MODEL_SEED,
     };
     const requestKey = simulationRequestKey(payload);
     const requestId = activeRequestId.current + 1;
@@ -97,7 +98,7 @@ export function WorkbenchProvider({ children }) {
         setError(requestError.message);
       }
     }
-  }, [analysisMode, selectedControlIds, selectedScenarioId]);
+  }, [selectedControlIds, selectedScenarioId]);
 
   useEffect(() => {
     runSimulation();
@@ -117,14 +118,12 @@ export function WorkbenchProvider({ children }) {
   const resetScenario = useCallback(() => {
     const scenario = config?.scenarios.find((item) => item.id === selectedScenarioId);
     setSelectedControlIds(scenario?.recommendedControlIds || []);
-    setAnalysisMode("launch-event");
   }, [config, selectedScenarioId]);
 
   const resetDemo = useCallback(() => {
     const launchScenario = config?.scenarios.find((item) => item.id === "launch-ddos");
     setSelectedScenarioIdState("launch-ddos");
     setSelectedControlIds(launchScenario?.recommendedControlIds || ["cdn-scrubbing", "rate-limiting"]);
-    setAnalysisMode("launch-event");
     setError("");
     setDemoResetVersion((current) => current + 1);
   }, [config]);
@@ -164,8 +163,6 @@ export function WorkbenchProvider({ children }) {
     () => ({
       selectedScenarioId,
       setSelectedScenarioId,
-      analysisMode,
-      setAnalysisMode,
       selectedControlIds,
       toggleControl,
       resetScenario,
@@ -181,7 +178,7 @@ export function WorkbenchProvider({ children }) {
       readinessScore,
       readinessBreakdown,
     }),
-    [selectedScenarioId, setSelectedScenarioId, analysisMode, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
+    [selectedScenarioId, setSelectedScenarioId, selectedControlIds, toggleControl, resetScenario, resetDemo, demoResetVersion, config, results, status, error, lastUpdatedAt, runSimulation, retryConnection, readinessScore, readinessBreakdown],
   );
 
   return (
